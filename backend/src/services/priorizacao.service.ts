@@ -23,7 +23,7 @@ function contagemZerada(): Record<Severidade, number> {
 }
 
 /**
- * Gera o resumo de prioridades a partir de uma lista já ordenada (ou não):
+ * Gera o resumo de prioridades a partir de uma lista (ordenando-a internamente):
  * contagem por severidade, tempo total estimado e os principais itens a corrigir.
  */
 export function resumirPrioridades(
