@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { calcularScore } from "./scoring.service";
+import { DNS_VAZIO } from "../scanner/dns.scanner";
 import type { ScanResultado } from "../types/scanner.types";
 
 /** ScanResultado de um site "perfeito" — sem nenhum achado. */
@@ -31,6 +32,7 @@ function base(): ScanResultado {
       quantidadeRequisicoesIniciais: 1,
     },
     cors: { accessControlAllowOrigin: null, accessControlAllowCredentials: false },
+    dns: DNS_VAZIO,
   };
 }
 

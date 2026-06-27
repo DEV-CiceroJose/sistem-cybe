@@ -4,9 +4,11 @@ import { detectarExposicao, verificarArquivo } from "./exposicao.scanner";
 import { detectarTecnologias } from "./tecnologias.scanner";
 import { medirPerformance } from "./performance.scanner";
 import { extrairCors } from "./cors.scanner";
+import { consultarDns, DNS_VAZIO } from "./dns.scanner";
+import { analisarEmail } from "./email.scanner";
 import { validarFormatoUrl, resolverEValidarHost } from "../utils/ssrfGuard";
 import { env } from "../config/env";
-import type { ScanResultado } from "../types/scanner.types";
+import type { ScanResultado, DnsInfo } from "../types/scanner.types";
 
 export class ScanError extends Error {}
 
@@ -90,6 +92,17 @@ export async function executarScan(rawUrl: string): Promise<{ resultado: ScanRes
   const performance = medirPerformance(resp.headers, html, tempoRespostaMs);
   const cors = extrairCors(resp.headers);
 
+  let dns: DnsInfo;
+  try {
+    const [base, email] = await Promise.all([
+      consultarDns(hostnameFinal),
+      analisarEmail(hostnameFinal),
+    ]);
+    dns = { ...base, email };
+  } catch (e: any) {
+    dns = { ...DNS_VAZIO, erro: e?.message || "Falha ao consultar DNS." };
+  }
+
   const resultado: ScanResultado = {
     https,
     headers: headersInfo,
@@ -102,6 +115,7 @@ export async function executarScan(rawUrl: string): Promise<{ resultado: ScanRes
     tecnologias,
     performance,
     cors,
+    dns,
   };
 
   return { resultado, urlFinal };

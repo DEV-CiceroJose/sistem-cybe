@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { gerarRelatorioHtml } from "./html.report";
+import { DNS_VAZIO } from "../scanner/dns.scanner";
 import type { DadosRelatorio } from "./relatorio.types";
 
 function dados(over: Partial<DadosRelatorio> = {}): DadosRelatorio {
@@ -17,6 +18,7 @@ function dados(over: Partial<DadosRelatorio> = {}): DadosRelatorio {
       tecnologias: { frameworks: ["React"], cms: [], servidorWeb: "nginx", cdn: [], bibliotecasJs: [], linguagem: null },
       performance: { tempoRespostaMs: 320, compressao: "br", cache: "max-age=60", tamanhoPaginaBytes: 2048, quantidadeRequisicoesIniciais: 5 },
       cors: { accessControlAllowOrigin: null, accessControlAllowCredentials: false },
+      dns: { ...DNS_VAZIO, a: ["1.2.3.4"], mx: [{ exchange: "mx.acme.com", prioridade: 10 }], email: { spf: { presente: true, registro: "v=spf1 -all" }, dkim: { selectoresEncontrados: ["google"] }, dmarc: { presente: true, politica: "reject", registro: "v=DMARC1; p=reject" } } },
     },
     categorias: [
       { categoria: "HTTPS", pontos: 30, pontosMaximos: 30, problemas: [], aprovados: ["ok"] },

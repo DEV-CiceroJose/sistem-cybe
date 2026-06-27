@@ -52,6 +52,7 @@ model Resultado {
   scoreDetalhe    String
   vulnerabilidades String @default("[]")
   cors            String @default("{\"accessControlAllowOrigin\":null,\"accessControlAllowCredentials\":false}")
+  dns             String @default("{\"a\":[],\"aaaa\":[],\"mx\":[],\"txt\":[],\"ns\":[],\"cname\":[],\"email\":{\"spf\":{\"presente\":false,\"registro\":null},\"dkim\":{\"selectoresEncontrados\":[]},\"dmarc\":{\"presente\":false,\"politica\":null,\"registro\":null}}}")
 
   criadoEm      DateTime @default(now())
 }

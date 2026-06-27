@@ -16,6 +16,7 @@ const resultado = {
   tecnologias: { frameworks: [], cms: [], servidorWeb: null, cdn: [], bibliotecasJs: [], linguagem: null },
   performance: { tempoRespostaMs: 100, compressao: null, cache: null, tamanhoPaginaBytes: 1, quantidadeRequisicoesIniciais: 1 },
   cors: { accessControlAllowOrigin: null, accessControlAllowCredentials: false },
+  dns: { a: [], aaaa: [], mx: [], txt: [], ns: [], cname: [], email: { spf: { presente: false, registro: null }, dkim: { selectoresEncontrados: [] }, dmarc: { presente: false, politica: null, registro: null } } },
   scoreDetalhe: [{ categoria: "HTTPS", pontos: 30, pontosMaximos: 30, problemas: [], aprovados: [] }],
   vulnerabilidades: [{ id: "v1", refId: "header-csp-ausente", titulo: "CSP ausente", descricao: "d", categoria: "Headers", severidade: "ALTA" as const, cvss: 6.1, impacto: 4, facilidadeCorrecao: 2, tempoEstimado: "2-4h", tempoEstimadoMin: 180, recomendacao: "Defina CSP" }],
 };

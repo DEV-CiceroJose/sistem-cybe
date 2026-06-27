@@ -9,6 +9,7 @@ import { gerarRelatorioMarkdown } from "../reports/markdown.report";
 import { gerarRelatorioHtml } from "../reports/html.report";
 import { montarDadosRelatorio } from "../reports/montarDados";
 import { avaliarConformidade } from "../services/conformidade.service";
+import { DNS_VAZIO } from "../scanner/dns.scanner";
 import { HttpError } from "../middlewares/error.middleware";
 
 const RELATORIOS_DIR = path.join(process.cwd(), "relatorios");
@@ -59,6 +60,7 @@ export async function criarAuditoria(req: Request, res: Response) {
           scoreDetalhe: JSON.stringify(scoreFinal.categorias),
           vulnerabilidades: JSON.stringify(scoreFinal.vulnerabilidades),
           cors: JSON.stringify(resultado.cors),
+          dns: JSON.stringify(resultado.dns),
         },
       }),
       prisma.relatorio.create({
@@ -142,6 +144,7 @@ export async function buscarRelatorioHtml(req: Request, res: Response) {
     scoreDetalhe: JSON.parse(auditoria.resultado.scoreDetalhe),
     vulnerabilidades: JSON.parse(auditoria.resultado.vulnerabilidades || "[]"),
     cors: JSON.parse(auditoria.resultado.cors || '{"accessControlAllowOrigin":null,"accessControlAllowCredentials":false}'),
+    dns: JSON.parse(auditoria.resultado.dns || JSON.stringify(DNS_VAZIO)),
   };
 
   const dados = montarDadosRelatorio(auditoria, resultado, configs);
@@ -171,6 +174,7 @@ function serializarAuditoria(auditoria: any) {
         scoreDetalhe: JSON.parse(auditoria.resultado.scoreDetalhe),
         vulnerabilidades: JSON.parse(auditoria.resultado.vulnerabilidades || "[]"),
         cors: JSON.parse(auditoria.resultado.cors || '{"accessControlAllowOrigin":null,"accessControlAllowCredentials":false}'),
+        dns: JSON.parse(auditoria.resultado.dns || JSON.stringify(DNS_VAZIO)),
       }
     : null;
   return {

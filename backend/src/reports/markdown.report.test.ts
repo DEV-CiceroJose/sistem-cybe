@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { gerarRelatorioMarkdown } from "./markdown.report";
 import { calcularScore } from "../services/scoring.service";
+import { DNS_VAZIO } from "../scanner/dns.scanner";
 import type { ScanResultado } from "../types/scanner.types";
 
 function base(): ScanResultado {
@@ -12,6 +13,7 @@ function base(): ScanResultado {
     tecnologias: { frameworks: [], cms: [], servidorWeb: "nginx", cdn: [], bibliotecasJs: [], linguagem: null },
     performance: { tempoRespostaMs: 200, compressao: "br", cache: "max-age=60", tamanhoPaginaBytes: 1000, quantidadeRequisicoesIniciais: 3 },
     cors: { accessControlAllowOrigin: null, accessControlAllowCredentials: false },
+    dns: DNS_VAZIO,
   };
 }
 

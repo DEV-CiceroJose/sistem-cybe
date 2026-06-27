@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { avaliarConformidade } from "./conformidade.service";
+import { DNS_VAZIO } from "../scanner/dns.scanner";
 import type { ScanResultado } from "../types/scanner.types";
 
 function base(): ScanResultado {
@@ -11,6 +12,7 @@ function base(): ScanResultado {
     tecnologias: { frameworks: [], cms: [], servidorWeb: null, cdn: [], bibliotecasJs: [], linguagem: null },
     performance: { tempoRespostaMs: 100, compressao: "br", cache: "max-age=60", tamanhoPaginaBytes: 1, quantidadeRequisicoesIniciais: 1 },
     cors: { accessControlAllowOrigin: null, accessControlAllowCredentials: false },
+    dns: DNS_VAZIO,
   };
 }
 

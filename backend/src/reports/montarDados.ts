@@ -35,6 +35,7 @@ export function montarDadosRelatorio(
     tecnologias: resultado.tecnologias,
     performance: resultado.performance,
     cors: resultado.cors,
+    dns: resultado.dns,
   };
   return {
     url: auditoria.url,
