@@ -23,7 +23,7 @@ dos dados já produzidos pela auditoria (Sprint 1). Sem refazer nenhum scan.
 
 ### No escopo
 Mapeado às funcionalidades do roadmap (Sprint 2):
-- Capa personalizada (empresa, logo, título, URL, data, auditor).
+- Capa personalizada (empresa, nome do site, logo, título, URL, data, auditor).
 - Sumário automático + índice clicável (âncoras internas).
 - Resumo executivo (score, classificação, contagem de achados por severidade).
 - Gráficos: donut do score, barras de pontos por categoria, barras de
@@ -82,6 +82,7 @@ Frontend:
 // relatorio.types.ts
 interface MarcaRelatorio {
   empresa: string;     // default "Web Security Analyzer"
+  site: string;        // default "" (nome/endereço do site da empresa)
   auditor: string;     // default ""
   contato: string;     // default ""
   logoUrl: string;     // default "" (sem logo)
@@ -102,7 +103,7 @@ interface DadosRelatorio {
 
 // branding.service.ts
 function lerMarca(configs: { chave: string; valor: string }[]): MarcaRelatorio;
-// chaves: relatorio.empresa, relatorio.auditor, relatorio.contato, relatorio.logoUrl
+// chaves: relatorio.empresa, relatorio.site, relatorio.auditor, relatorio.contato, relatorio.logoUrl
 
 // charts.svg.ts  (todas retornam string SVG autocontida)
 function donutScore(score: number, classificacao: string): string;
@@ -147,8 +148,8 @@ com `break-before: page`. (Limitação conhecida do print do navegador é aceita
 
 ## Estratégia de testes (TDD, Vitest no backend)
 
-- `branding.service`: defaults quando vazio; override por chave; ignora chaves
-  estranhas.
+- `branding.service`: defaults quando vazio; override por chave (incl. `relatorio.site`);
+  ignora chaves estranhas.
 - `charts.svg`: retorna `<svg`; donut reflete o score (ângulo/segmento); barras
   geram uma barra por item; lida com lista vazia / zeros.
 - `html.report`: contém a empresa na capa; âncoras do índice batem com ids das
