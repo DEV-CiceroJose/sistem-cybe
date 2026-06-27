@@ -1,0 +1,38 @@
+import axios from "axios";
+import type { Auditoria } from "../types";
+
+export const api = axios.create({
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:3001/api",
+  timeout: 30000,
+});
+
+export async function criarAuditoria(url: string): Promise<Auditoria> {
+  const { data } = await api.post("/auditorias", { url });
+  return data.dados;
+}
+
+export async function listarHistorico(limite = 20): Promise<Auditoria[]> {
+  const { data } = await api.get("/auditorias", { params: { limite } });
+  return data.dados;
+}
+
+export async function buscarAuditoria(id: string): Promise<Auditoria> {
+  const { data } = await api.get(`/auditorias/${id}`);
+  return data.dados;
+}
+
+export async function buscarRelatorioMarkdown(id: string): Promise<string> {
+  const { data } = await api.get(`/auditorias/${id}/relatorio`, { responseType: "text" });
+  return data;
+}
+
+export async function excluirAuditoria(id: string): Promise<void> {
+  await api.delete(`/auditorias/${id}`);
+}
+
+export function extrairMensagemErro(erro: unknown): string {
+  if (axios.isAxiosError(erro)) {
+    return erro.response?.data?.erro || erro.message || "Erro de comunicação com o servidor.";
+  }
+  return erro instanceof Error ? erro.message : "Erro desconhecido.";
+}

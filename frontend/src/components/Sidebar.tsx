@@ -1,0 +1,46 @@
+import { NavLink } from "react-router-dom";
+
+const links = [
+  { to: "/", label: "Dashboard", icon: "◧" },
+  { to: "/nova-auditoria", label: "Nova Auditoria", icon: "▣" },
+  { to: "/historico", label: "Histórico", icon: "≡" },
+  { to: "/configuracoes", label: "Configurações", icon: "⚙" },
+];
+
+export function Sidebar() {
+  return (
+    <aside className="hidden md:flex md:w-60 flex-col border-r border-line bg-bg-panel/60 px-4 py-6">
+      <div className="mb-8 px-2">
+        <div className="flex items-center gap-2">
+          <span className="text-accent text-lg font-display">▢</span>
+          <span className="font-display text-sm tracking-widest text-slate-100">WEBSEC</span>
+        </div>
+        <p className="mt-1 text-[11px] text-slate-500 tracking-wide">ANALYZER · SPRINT 0</p>
+      </div>
+
+      <nav className="flex flex-col gap-1">
+        {links.map((link) => (
+          <NavLink
+            key={link.to}
+            to={link.to}
+            className={({ isActive }) =>
+              `flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors ${
+                isActive
+                  ? "bg-accent/10 text-accent border border-accent/30"
+                  : "text-slate-400 hover:text-slate-200 hover:bg-bg-raised border border-transparent"
+              }`
+            }
+          >
+            <span className="font-display text-xs">{link.icon}</span>
+            {link.label}
+          </NavLink>
+        ))}
+      </nav>
+
+      <div className="mt-auto px-2 pt-6 text-[11px] text-slate-600 leading-relaxed">
+        <p>Verificações exclusivamente passivas.</p>
+        <p>Sem exploração de vulnerabilidades.</p>
+      </div>
+    </aside>
+  );
+}

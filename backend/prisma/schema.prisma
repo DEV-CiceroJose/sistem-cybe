@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum AuditoriaStatus {
+  PENDENTE
+  EM_ANDAMENTO
+  CONCLUIDA
+  ERRO
+}
+
+enum Classificacao {
+  EXCELENTE
+  BOA
+  ATENCAO
+  CRITICA
+}
+
+model Auditoria {
+  id            String          @id @default(uuid())
+  url           String
+  status        AuditoriaStatus @default(PENDENTE)
+  score         Int?
+  classificacao Classificacao?
+  erro          String?
+  criadoEm      DateTime        @default(now())
+  concluidoEm   DateTime?
+
+  resultado     Resultado?
+  relatorio     Relatorio?
+
+  @@index([url])
+  @@index([criadoEm])
+}
+
+model Resultado {
+  id            String   @id @default(uuid())
+  auditoriaId   String   @unique
+  auditoria     Auditoria @relation(fields: [auditoriaId], references: [id], onDelete: Cascade)
+
+  https           String
+  headers         String
+  cookies         String
+  exposicao       String
+  tecnologias     String
+  performance     String
+  scoreDetalhe    String
+  vulnerabilidades String @default("[]")
+
+  criadoEm      DateTime @default(now())
+}
+
+model Relatorio {
+  id              String   @id @default(uuid())
+  auditoriaId     String   @unique
+  auditoria       Auditoria @relation(fields: [auditoriaId], references: [id], onDelete: Cascade)
+  caminhoArquivo  String
+  conteudoMarkdown String
+  criadoEm        DateTime @default(now())
+}
+
+model Configuracao {
+  id           String   @id @default(uuid())
+  chave        String   @unique
+  valor        String
+  atualizadoEm DateTime @updatedAt
+}

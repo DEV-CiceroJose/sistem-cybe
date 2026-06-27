@@ -1,0 +1,34 @@
+version: "3.9"
+
+services:
+  backend:
+    build: ./backend
+    container_name: websec-backend
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - NODE_ENV=production
+      - DATABASE_URL=file:./data/dev.db
+      - SCAN_TIMEOUT_MS=8000
+      - MAX_RESPONSE_BYTES=5242880
+      - CORS_ORIGIN=http://localhost:5173
+    volumes:
+      - backend_data:/app/data
+      - backend_reports:/app/relatorios
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    container_name: websec-frontend
+    ports:
+      - "5173:80"
+    environment:
+      - VITE_API_URL=http://localhost:3001/api
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  backend_data:
+  backend_reports:
