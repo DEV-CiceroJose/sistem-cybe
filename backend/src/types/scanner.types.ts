@@ -55,6 +55,43 @@ export interface CorsInfo {
   accessControlAllowCredentials: boolean;
 }
 
+export interface MxRecord {
+  exchange: string;
+  prioridade: number;
+}
+
+export interface SpfInfo {
+  presente: boolean;
+  registro: string | null;
+}
+
+export interface DmarcInfo {
+  presente: boolean;
+  politica: string | null;
+  registro: string | null;
+}
+
+export interface DkimInfo {
+  selectoresEncontrados: string[];
+}
+
+export interface EmailSeguranca {
+  spf: SpfInfo;
+  dkim: DkimInfo;
+  dmarc: DmarcInfo;
+}
+
+export interface DnsInfo {
+  a: string[];
+  aaaa: string[];
+  mx: MxRecord[];
+  txt: string[];
+  ns: string[];
+  cname: string[];
+  email: EmailSeguranca;
+  erro?: string;
+}
+
 export interface ScanResultado {
   https: HttpsInfo;
   headers: HeadersInfo;
@@ -63,6 +100,7 @@ export interface ScanResultado {
   tecnologias: TecnologiasInfo;
   performance: PerformanceInfo;
   cors: CorsInfo;
+  dns: DnsInfo;
 }
 
 export interface ScoreCategoria {
