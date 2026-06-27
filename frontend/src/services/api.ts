@@ -35,6 +35,15 @@ export async function excluirAuditoria(id: string): Promise<void> {
   await api.delete(`/auditorias/${id}`);
 }
 
+export async function listarConfiguracoes(): Promise<{ chave: string; valor: string }[]> {
+  const { data } = await api.get("/configuracoes");
+  return data.dados;
+}
+
+export async function salvarConfiguracao(chave: string, valor: string): Promise<void> {
+  await api.put("/configuracoes", { chave, valor });
+}
+
 export function extrairMensagemErro(erro: unknown): string {
   if (axios.isAxiosError(erro)) {
     return erro.response?.data?.erro || erro.message || "Erro de comunicação com o servidor.";
