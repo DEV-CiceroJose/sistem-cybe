@@ -44,4 +44,11 @@ describe("gerarRelatorioMarkdown (aprimorado)", () => {
     expect(md).toContain("## Conformidade (OWASP Top 10)");
     expect(md).toContain("Conformidade geral:");
   });
+
+  it("inclui a seção DNS & E-mail", () => {
+    const r = base();
+    const md = gerarRelatorioMarkdown("https://exemplo.com", r, calcularScore(r));
+    expect(md).toContain("## DNS & E-mail");
+    expect(md).toContain("SPF");
+  });
 });

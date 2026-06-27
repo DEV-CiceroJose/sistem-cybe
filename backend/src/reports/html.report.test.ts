@@ -51,7 +51,7 @@ describe("gerarRelatorioHtml", () => {
 
   it("inclui índice clicável com âncoras que existem como ids de seção", () => {
     const html = gerarRelatorioHtml(dados());
-    for (const id of ["resumo", "graficos", "linha-do-tempo", "evidencias", "plano-de-acao", "recomendacoes", "conformidade", "assinatura"]) {
+    for (const id of ["resumo", "graficos", "linha-do-tempo", "evidencias", "dns", "plano-de-acao", "recomendacoes", "conformidade", "assinatura"]) {
       expect(html).toContain(`href="#${id}"`);
       expect(html).toContain(`id="${id}"`);
     }
@@ -90,6 +90,14 @@ describe("gerarRelatorioHtml", () => {
   it("sem vulnerabilidades, o plano mostra estado positivo", () => {
     const html = gerarRelatorioHtml(dados({ vulnerabilidades: [], resumoPrioridades: { total: 0, porSeveridade: { CRITICA: 0, ALTA: 0, MEDIA: 0, BAIXA: 0, INFORMATIVA: 0 }, tempoTotalEstimadoMin: 0, corrijaPrimeiro: [] } }));
     expect(html).toContain("Nenhuma vulnerabilidade");
+  });
+
+  it("inclui a seção DNS & E-mail com registros e status de e-mail", () => {
+    const html = gerarRelatorioHtml(dados());
+    expect(html).toContain('id="dns"');
+    expect(html).toContain("1.2.3.4");
+    expect(html).toContain("mx.acme.com");
+    expect(html).toContain("SPF");
   });
 
   it("inclui a seção de conformidade com a porcentagem", () => {

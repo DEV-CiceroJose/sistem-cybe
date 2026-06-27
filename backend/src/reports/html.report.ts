@@ -127,10 +127,11 @@ export function gerarRelatorioHtml(d: DadosRelatorio): string {
       <li><a href="#graficos">2. Gráficos</a></li>
       <li><a href="#linha-do-tempo">3. Linha do Tempo</a></li>
       <li><a href="#evidencias">4. Evidências Técnicas</a></li>
-      <li><a href="#plano-de-acao">5. Plano de Ação</a></li>
-      <li><a href="#recomendacoes">6. Recomendações</a></li>
-      <li><a href="#conformidade">7. Conformidade (OWASP)</a></li>
-      <li><a href="#assinatura">8. Assinatura</a></li>
+      <li><a href="#dns">5. DNS &amp; E-mail</a></li>
+      <li><a href="#plano-de-acao">6. Plano de Ação</a></li>
+      <li><a href="#recomendacoes">7. Recomendações</a></li>
+      <li><a href="#conformidade">8. Conformidade (OWASP)</a></li>
+      <li><a href="#assinatura">9. Assinatura</a></li>
     </ul>
   </nav>
 
@@ -180,19 +181,37 @@ export function gerarRelatorioHtml(d: DadosRelatorio): string {
     </table>
   </section>
 
+  <section id="dns" class="secao">
+    <h2>5. DNS &amp; E-mail</h2>
+    <table>
+      <tr><td>A</td><td>${r.dns.a.map(esc).join(", ") || "—"}</td></tr>
+      <tr><td>AAAA</td><td>${r.dns.aaaa.map(esc).join(", ") || "—"}</td></tr>
+      <tr><td>MX</td><td>${r.dns.mx.map((m) => esc(`${m.exchange} (${m.prioridade})`)).join(", ") || "—"}</td></tr>
+      <tr><td>NS</td><td>${r.dns.ns.map(esc).join(", ") || "—"}</td></tr>
+      <tr><td>CNAME</td><td>${r.dns.cname.map(esc).join(", ") || "—"}</td></tr>
+      <tr><td>TXT</td><td>${r.dns.txt.map(esc).join("<br/>") || "—"}</td></tr>
+    </table>
+    <h3>Segurança de E-mail</h3>
+    <table>
+      <tr><td>SPF</td><td>${r.dns.email.spf.presente ? "Presente" : "Ausente"}</td></tr>
+      <tr><td>DMARC</td><td>${r.dns.email.dmarc.presente ? `Presente (p=${esc(r.dns.email.dmarc.politica || "?")})` : "Ausente"}</td></tr>
+      <tr><td>DKIM</td><td>${r.dns.email.dkim.selectoresEncontrados.length ? esc(r.dns.email.dkim.selectoresEncontrados.join(", ")) : "Não detectado"}</td></tr>
+    </table>
+  </section>
+
   <section id="plano-de-acao" class="secao">
-    <h2>5. Plano de Ação</h2>
+    <h2>6. Plano de Ação</h2>
     <table><thead><tr><th>Severidade</th><th>Achado</th><th>Categoria</th><th>CVSS</th><th>Esforço</th></tr></thead>
     <tbody>${planoLinhas}</tbody></table>
   </section>
 
   <section id="recomendacoes" class="secao">
-    <h2>6. Recomendações</h2>
+    <h2>7. Recomendações</h2>
     <ul>${recomendacoes || "<li>Nenhuma recomendação adicional.</li>"}</ul>
   </section>
 
   <section id="conformidade" class="secao">
-    <h2>7. Conformidade (OWASP Top 10)</h2>
+    <h2>8. Conformidade (OWASP Top 10)</h2>
     <p>Conformidade geral: <strong>${d.conformidade.percentual}%</strong></p>
     ${d.conformidade.grupos
       .map(
@@ -209,7 +228,7 @@ export function gerarRelatorioHtml(d: DadosRelatorio): string {
   </section>
 
   <section id="assinatura" class="secao">
-    <h2>8. Assinatura</h2>
+    <h2>9. Assinatura</h2>
     <p>Relatório emitido por <strong>${esc(marca.empresa)}</strong>${marca.site ? ` (${esc(marca.site)})` : ""}.</p>
     <p>Auditor responsável: <strong>${esc(marca.auditor || "—")}</strong>${marca.contato ? ` · ${esc(marca.contato)}` : ""}.</p>
     <p class="muted">Data de emissão: ${dataBr(d.concluidoEm || d.criadoEm)}</p>

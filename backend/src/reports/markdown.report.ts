@@ -37,6 +37,7 @@ export function gerarRelatorioMarkdown(url: string, resultado: ScanResultado, sc
   const recomendacoes = gerarRecomendacoes(resultado, todosProblemas);
   const planoDeAcao = gerarPlanoDeAcao(scoreFinal);
   const evidencias = gerarEvidencias(resultado);
+  const dnsMd = gerarDnsMd(resultado.dns);
   const conformidadeMd = gerarConformidadeMd(avaliarConformidade(resultado));
 
   return `# Relatório de Análise de Segurança
@@ -73,6 +74,8 @@ ${recomendacoes.length > 0 ? recomendacoes.map((r) => `- ${r}`).join("\n") : "- 
 
 ${evidencias}
 
+${dnsMd}
+
 ${conformidadeMd}
 
 ## Conclusão
@@ -87,6 +90,25 @@ As verificações realizadas são exclusivamente passivas.
 ---
 *Relatório gerado automaticamente pelo Web Security Analyzer. As verificações realizadas são exclusivamente passivas e não envolvem exploração de vulnerabilidades.*
 `;
+}
+
+function gerarDnsMd(dns: ScanResultado["dns"]): string {
+  const linha = (rotulo: string, valor: string) => `- **${rotulo}:** ${valor || "—"}`;
+  const email = dns.email;
+  return `## DNS & E-mail
+
+${linha("A", dns.a.join(", "))}
+${linha("AAAA", dns.aaaa.join(", "))}
+${linha("MX", dns.mx.map((m) => `${m.exchange} (${m.prioridade})`).join(", "))}
+${linha("NS", dns.ns.join(", "))}
+${linha("CNAME", dns.cname.join(", "))}
+${linha("TXT", dns.txt.join(" | "))}
+
+### Segurança de E-mail
+
+- **SPF:** ${email.spf.presente ? "presente" : "ausente"}
+- **DMARC:** ${email.dmarc.presente ? `presente (p=${email.dmarc.politica || "?"})` : "ausente"}
+- **DKIM:** ${email.dkim.selectoresEncontrados.length ? email.dkim.selectoresEncontrados.join(", ") : "não detectado"}`;
 }
 
 function gerarConformidadeMd(c: ReturnType<typeof avaliarConformidade>): string {

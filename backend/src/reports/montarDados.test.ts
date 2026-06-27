@@ -42,7 +42,7 @@ describe("montarDadosRelatorio", () => {
   it("inclui conformidade calculada do resultado", () => {
     const d = montarDadosRelatorio(auditoria, resultado, []);
     expect(d.conformidade).toBeDefined();
-    expect(d.conformidade.grupos.length).toBe(5);
+    expect(d.conformidade.grupos.length).toBe(6);
     expect(typeof d.conformidade.percentual).toBe("number");
   });
 });
