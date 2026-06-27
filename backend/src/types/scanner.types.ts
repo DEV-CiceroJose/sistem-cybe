@@ -175,3 +175,31 @@ export interface ConformidadeResultado {
   total: number;
   percentual: number;
 }
+
+export interface AuditoriaComparavel {
+  id: string;
+  score: number;
+  conformidadePercentual: number;
+  vulnerabilidades: Vulnerabilidade[];
+}
+
+export interface AchadoDiff {
+  refId: string;
+  titulo: string;
+  severidade: Severidade;
+  detalhe?: string;
+}
+
+export interface ComparacaoResultado {
+  baseId: string;
+  atualId: string;
+  scoreAnterior: number;
+  scoreAtual: number;
+  scoreDelta: number;
+  conformidadeAnterior: number;
+  conformidadeAtual: number;
+  conformidadeDelta: number;
+  novos: AchadoDiff[];
+  resolvidos: AchadoDiff[];
+  mantidos: AchadoDiff[];
+}
