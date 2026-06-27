@@ -110,3 +110,30 @@ export interface ScoreFinal {
   vulnerabilidades: Vulnerabilidade[];
   resumoPrioridades: ResumoPrioridades;
 }
+
+export type StatusConformidade = "CONFORME" | "PARCIAL" | "NAO_CONFORME";
+
+export interface ItemConformidade {
+  id: string;
+  titulo: string;
+  status: StatusConformidade;
+  referenciaOwasp: string;
+  explicacao: string;
+  recomendacao: string;
+  detalhe?: string;
+}
+
+export interface GrupoConformidade {
+  grupo: string;
+  itens: ItemConformidade[];
+  conformes: number;
+  total: number;
+  percentual: number;
+}
+
+export interface ConformidadeResultado {
+  grupos: GrupoConformidade[];
+  conformes: number;
+  total: number;
+  percentual: number;
+}
