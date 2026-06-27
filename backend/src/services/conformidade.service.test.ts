@@ -12,7 +12,14 @@ function base(): ScanResultado {
     tecnologias: { frameworks: [], cms: [], servidorWeb: null, cdn: [], bibliotecasJs: [], linguagem: null },
     performance: { tempoRespostaMs: 100, compressao: "br", cache: "max-age=60", tamanhoPaginaBytes: 1, quantidadeRequisicoesIniciais: 1 },
     cors: { accessControlAllowOrigin: null, accessControlAllowCredentials: false },
-    dns: DNS_VAZIO,
+    dns: {
+      ...DNS_VAZIO,
+      email: {
+        spf: { presente: true, registro: "v=spf1 -all" },
+        dkim: { selectoresEncontrados: ["google"] },
+        dmarc: { presente: true, politica: "reject", registro: "v=DMARC1; p=reject" },
+      },
+    },
   };
 }
 
@@ -21,7 +28,7 @@ describe("avaliarConformidade", () => {
     const c = avaliarConformidade(base());
     expect(c.percentual).toBe(100);
     expect(c.grupos.map((g) => g.grupo)).toEqual([
-      "HTTPS/TLS", "Cabeçalhos HTTP", "Cookies", "CORS", "Exposição de Informação",
+      "HTTPS/TLS", "Cabeçalhos HTTP", "Cookies", "CORS", "Exposição de Informação", "Segurança de E-mail",
     ]);
     expect(c.grupos.every((g) => g.itens.every((i) => i.status === "CONFORME"))).toBe(true);
   });
@@ -64,6 +71,37 @@ describe("avaliarConformidade", () => {
     const c = avaliarConformidade(r);
     const grupo = c.grupos.find((g) => g.grupo === "CORS")!;
     expect(grupo.itens.find((i) => i.id === "cors-restritivo")!.status).toBe("PARCIAL");
+  });
+
+  it("grupo Segurança de E-mail: SPF+DMARC reject+DKIM => CONFORME", () => {
+    const c = avaliarConformidade(base());
+    const grupo = c.grupos.find((g) => g.grupo === "Segurança de E-mail")!;
+    expect(grupo.itens.every((i) => i.status === "CONFORME")).toBe(true);
+  });
+
+  it("DMARC p=none => política PARCIAL; sem DKIM => email-dkim PARCIAL", () => {
+    const r = base();
+    r.dns = {
+      ...r.dns,
+      email: {
+        spf: { presente: true, registro: "v=spf1 -all" },
+        dkim: { selectoresEncontrados: [] },
+        dmarc: { presente: true, politica: "none", registro: "v=DMARC1; p=none" },
+      },
+    };
+    const c = avaliarConformidade(r);
+    const grupo = c.grupos.find((g) => g.grupo === "Segurança de E-mail")!;
+    expect(grupo.itens.find((i) => i.id === "email-dmarc-politica")!.status).toBe("PARCIAL");
+    expect(grupo.itens.find((i) => i.id === "email-dkim")!.status).toBe("PARCIAL");
+  });
+
+  it("sem SPF/DMARC => itens NAO_CONFORME", () => {
+    const r = base();
+    r.dns = { ...r.dns, email: { spf: { presente: false, registro: null }, dkim: { selectoresEncontrados: [] }, dmarc: { presente: false, politica: null, registro: null } } };
+    const c = avaliarConformidade(r);
+    const grupo = c.grupos.find((g) => g.grupo === "Segurança de E-mail")!;
+    expect(grupo.itens.find((i) => i.id === "email-spf")!.status).toBe("NAO_CONFORME");
+    expect(grupo.itens.find((i) => i.id === "email-dmarc")!.status).toBe("NAO_CONFORME");
   });
 
   it("percentual do grupo de cabeçalhos: 5 de 6 presentes => 83%", () => {

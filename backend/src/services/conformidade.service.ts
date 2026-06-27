@@ -195,6 +195,61 @@ function avaliarExposicao(r: ScanResultado): GrupoConformidade {
   return montarGrupo("Exposição de Informação", itens);
 }
 
+function avaliarEmail(r: ScanResultado): GrupoConformidade {
+  const ref = "A05:2021 – Security Misconfiguration";
+  const { spf, dkim, dmarc } = r.dns.email;
+
+  const politicaForte = dmarc.politica === "reject" || dmarc.politica === "quarantine";
+  const statusPolitica: StatusConformidade = !dmarc.presente
+    ? "NAO_CONFORME"
+    : politicaForte
+      ? "CONFORME"
+      : "PARCIAL";
+
+  const itens: ItemConformidade[] = [
+    {
+      id: "email-spf",
+      titulo: "Registro SPF presente",
+      status: spf.presente ? "CONFORME" : "NAO_CONFORME",
+      referenciaOwasp: ref,
+      explicacao: "Sem SPF, terceiros podem enviar e-mails forjando o seu domínio.",
+      recomendacao: "Publique um registro TXT SPF (v=spf1 ...) listando os remetentes autorizados.",
+      detalhe: spf.registro || undefined,
+    },
+    {
+      id: "email-dmarc",
+      titulo: "Registro DMARC presente",
+      status: dmarc.presente ? "CONFORME" : "NAO_CONFORME",
+      referenciaOwasp: ref,
+      explicacao: "Sem DMARC, não há política de tratamento para e-mails que falham SPF/DKIM.",
+      recomendacao: "Publique um registro DMARC em _dmarc.<domínio>.",
+      detalhe: dmarc.registro || undefined,
+    },
+    {
+      id: "email-dmarc-politica",
+      titulo: "Política DMARC efetiva",
+      status: statusPolitica,
+      referenciaOwasp: ref,
+      explicacao: "Uma política 'none' apenas monitora; não bloqueia spoofing.",
+      recomendacao: "Evolua a política DMARC para quarantine e depois reject.",
+      detalhe: dmarc.politica ? `p=${dmarc.politica}` : undefined,
+    },
+    {
+      id: "email-dkim",
+      titulo: "DKIM detectado",
+      status: dkim.selectoresEncontrados.length > 0 ? "CONFORME" : "PARCIAL",
+      referenciaOwasp: ref,
+      explicacao: "DKIM assina os e-mails, permitindo verificar a integridade e a origem.",
+      recomendacao: "Configure DKIM no provedor de e-mail (verificação automática é best-effort por selectors comuns).",
+      detalhe:
+        dkim.selectoresEncontrados.length > 0
+          ? `Selectors: ${dkim.selectoresEncontrados.join(", ")}`
+          : "Nenhum selector comum encontrado.",
+    },
+  ];
+  return montarGrupo("Segurança de E-mail", itens);
+}
+
 /** Avalia a conformidade do site com o OWASP Top 10 (controles auto-avaliáveis). */
 export function avaliarConformidade(resultado: ScanResultado): ConformidadeResultado {
   const grupos = [
@@ -203,6 +258,7 @@ export function avaliarConformidade(resultado: ScanResultado): ConformidadeResul
     avaliarCookies(resultado),
     avaliarCors(resultado),
     avaliarExposicao(resultado),
+    avaliarEmail(resultado),
   ];
   const conformes = grupos.reduce((acc, g) => acc + g.conformes, 0);
   const total = grupos.reduce((acc, g) => acc + g.total, 0);
