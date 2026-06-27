@@ -111,6 +111,43 @@ export interface ConformidadeResultado {
   percentual: number;
 }
 
+export interface MxRecord {
+  exchange: string;
+  prioridade: number;
+}
+
+export interface SpfInfo {
+  presente: boolean;
+  registro: string | null;
+}
+
+export interface DmarcInfo {
+  presente: boolean;
+  politica: string | null;
+  registro: string | null;
+}
+
+export interface DkimInfo {
+  selectoresEncontrados: string[];
+}
+
+export interface EmailSeguranca {
+  spf: SpfInfo;
+  dkim: DkimInfo;
+  dmarc: DmarcInfo;
+}
+
+export interface DnsInfo {
+  a: string[];
+  aaaa: string[];
+  mx: MxRecord[];
+  txt: string[];
+  ns: string[];
+  cname: string[];
+  email: EmailSeguranca;
+  erro?: string;
+}
+
 export interface ResultadoAuditoria {
   https: HttpsInfo;
   headers: HeadersInfo;
@@ -119,6 +156,7 @@ export interface ResultadoAuditoria {
   tecnologias: TecnologiasInfo;
   performance: PerformanceInfo;
   cors: CorsInfo;
+  dns: DnsInfo;
   scoreDetalhe: ScoreCategoria[];
   vulnerabilidades: Vulnerabilidade[];
 }

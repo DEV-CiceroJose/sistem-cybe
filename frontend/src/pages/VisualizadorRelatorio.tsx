@@ -9,6 +9,7 @@ import { CategoriaScoreList } from "../components/CategoriaScoreList";
 import { StatusBadge } from "../components/StatusBadge";
 import { PlanoDeAcao } from "../components/PlanoDeAcao";
 import { ChecklistConformidade } from "../components/ChecklistConformidade";
+import { RegistrosDns } from "../components/RegistrosDns";
 import { buscarAuditoria, buscarRelatorioMarkdown, buscarRelatorioHtml, extrairMensagemErro } from "../services/api";
 import type { Auditoria } from "../types";
 
@@ -133,6 +134,8 @@ export function VisualizadorRelatorio() {
         )}
 
         {auditoria.conformidade && <ChecklistConformidade conformidade={auditoria.conformidade} />}
+
+        {r && r.dns && <RegistrosDns dns={r.dns} />}
 
         {r && (
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
