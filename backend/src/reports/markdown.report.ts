@@ -35,6 +35,7 @@ export function gerarRelatorioMarkdown(url: string, resultado: ScanResultado, sc
 
   const recomendacoes = gerarRecomendacoes(resultado, todosProblemas);
   const planoDeAcao = gerarPlanoDeAcao(scoreFinal);
+  const evidencias = gerarEvidencias(resultado);
 
   return `# Relatório de Análise de Segurança
 
@@ -68,13 +69,36 @@ ${todosAprovados.length > 0 ? todosAprovados.map((a) => `- ✅ ${a}`).join("\n")
 
 ${recomendacoes.length > 0 ? recomendacoes.map((r) => `- ${r}`).join("\n") : "- Nenhuma recomendação adicional."}
 
+${evidencias}
+
 ## Conclusão
 
 ${gerarConclusao(scoreFinal)}
 
+## Assinatura
+
+Relatório emitido pelo Web Security Analyzer em ${dataHora}.
+As verificações realizadas são exclusivamente passivas.
+
 ---
 *Relatório gerado automaticamente pelo Web Security Analyzer. As verificações realizadas são exclusivamente passivas e não envolvem exploração de vulnerabilidades.*
 `;
+}
+
+function gerarEvidencias(resultado: ScanResultado): string {
+  const { https, cookies, performance } = resultado;
+  const httpsLinha = `${https.habilitado ? "habilitado" : "ausente"}${https.versaoTLS ? ` · ${https.versaoTLS}` : ""}${https.emissor ? ` · Emissor: ${https.emissor}` : ""}${https.diasParaExpirar !== undefined ? ` · Expira em ${https.diasParaExpirar} dia(s)` : ""}`;
+  const cookiesLinha = cookies.length > 0
+    ? cookies.map((c) => `${c.nome} (Secure=${c.secure}, HttpOnly=${c.httpOnly}, SameSite=${c.sameSite || "—"})`).join("; ")
+    : "nenhum cookie na resposta inicial.";
+
+  return `## Evidências Técnicas
+
+**HTTPS/TLS:** ${httpsLinha}
+
+**Cookies:** ${cookiesLinha}
+
+**Performance:** tempo de resposta ${performance.tempoRespostaMs} ms · compressão ${performance.compressao || "nenhuma"} · cache ${performance.cache || "nenhum"}.`;
 }
 
 function gerarPlanoDeAcao(scoreFinal: ScoreFinal): string {
