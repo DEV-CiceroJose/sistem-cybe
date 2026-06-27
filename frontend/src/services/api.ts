@@ -26,6 +26,11 @@ export async function buscarRelatorioMarkdown(id: string): Promise<string> {
   return data;
 }
 
+export async function buscarRelatorioHtml(id: string): Promise<string> {
+  const { data } = await api.get(`/auditorias/${id}/relatorio.html`, { responseType: "text" });
+  return data;
+}
+
 export async function excluirAuditoria(id: string): Promise<void> {
   await api.delete(`/auditorias/${id}`);
 }

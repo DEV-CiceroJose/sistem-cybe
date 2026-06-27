@@ -8,8 +8,36 @@ import { ScoreGauge } from "../components/ScoreGauge";
 import { CategoriaScoreList } from "../components/CategoriaScoreList";
 import { StatusBadge } from "../components/StatusBadge";
 import { PlanoDeAcao } from "../components/PlanoDeAcao";
-import { buscarAuditoria, buscarRelatorioMarkdown, extrairMensagemErro } from "../services/api";
+import { buscarAuditoria, buscarRelatorioMarkdown, buscarRelatorioHtml, extrairMensagemErro } from "../services/api";
 import type { Auditoria } from "../types";
+
+function baixarArquivo(nome: string, conteudo: string, tipo: string) {
+  const blob = new Blob([conteudo], { type: tipo });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = nome;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+async function exportarPdf(id: string) {
+  const html = await buscarRelatorioHtml(id);
+  const iframe = document.createElement("iframe");
+  iframe.style.position = "fixed";
+  iframe.style.right = "0";
+  iframe.style.bottom = "0";
+  iframe.style.width = "0";
+  iframe.style.height = "0";
+  iframe.style.border = "0";
+  document.body.appendChild(iframe);
+  iframe.srcdoc = html;
+  iframe.onload = () => {
+    iframe.contentWindow?.focus();
+    iframe.contentWindow?.print();
+    setTimeout(() => document.body.removeChild(iframe), 1000);
+  };
+}
 
 function Pill({ ok, label }: { ok: boolean; label: string }) {
   return (
@@ -57,9 +85,26 @@ export function VisualizadorRelatorio() {
         <div className="flex items-center justify-between">
           <StatusBadge status={auditoria.status} />
           {auditoria.relatorio && (
-            <button onClick={handleVerMarkdown} className="text-xs text-accent hover:underline">
-              {mostrarMarkdown ? "Ocultar Markdown" : "Ver relatório em Markdown"}
-            </button>
+            <div className="flex items-center gap-3">
+              <button onClick={() => exportarPdf(auditoria.id)} className="text-xs text-accent hover:underline">
+                Exportar PDF
+              </button>
+              <button
+                onClick={async () => baixarArquivo(`relatorio-${auditoria.id}.html`, await buscarRelatorioHtml(auditoria.id), "text/html")}
+                className="text-xs text-accent hover:underline"
+              >
+                Exportar HTML
+              </button>
+              <button
+                onClick={async () => baixarArquivo(`relatorio-${auditoria.id}.md`, await buscarRelatorioMarkdown(auditoria.id), "text/markdown")}
+                className="text-xs text-accent hover:underline"
+              >
+                Exportar Markdown
+              </button>
+              <button onClick={handleVerMarkdown} className="text-xs text-slate-400 hover:text-accent hover:underline">
+                {mostrarMarkdown ? "Ocultar prévia" : "Prévia Markdown"}
+              </button>
+            </div>
           )}
         </div>
 
