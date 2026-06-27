@@ -50,6 +50,11 @@ export interface PerformanceInfo {
   quantidadeRequisicoesIniciais: number;
 }
 
+export interface CorsInfo {
+  accessControlAllowOrigin: string | null;
+  accessControlAllowCredentials: boolean;
+}
+
 export interface ScanResultado {
   https: HttpsInfo;
   headers: HeadersInfo;
@@ -57,6 +62,7 @@ export interface ScanResultado {
   exposicao: ExposicaoInfo;
   tecnologias: TecnologiasInfo;
   performance: PerformanceInfo;
+  cors: CorsInfo;
 }
 
 export interface ScoreCategoria {

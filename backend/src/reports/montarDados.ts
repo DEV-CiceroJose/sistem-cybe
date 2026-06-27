@@ -39,6 +39,7 @@ export function montarDadosRelatorio(
       exposicao: resultado.exposicao,
       tecnologias: resultado.tecnologias,
       performance: resultado.performance,
+      cors: resultado.cors,
     },
     categorias: resultado.scoreDetalhe ?? [],
     vulnerabilidades,

@@ -51,6 +51,7 @@ model Resultado {
   performance     String
   scoreDetalhe    String
   vulnerabilidades String @default("[]")
+  cors            String @default("{\"accessControlAllowOrigin\":null,\"accessControlAllowCredentials\":false}")
 
   criadoEm      DateTime @default(now())
 }

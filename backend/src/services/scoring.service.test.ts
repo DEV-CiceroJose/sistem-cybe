@@ -30,6 +30,7 @@ function base(): ScanResultado {
       tamanhoPaginaBytes: 1000,
       quantidadeRequisicoesIniciais: 1,
     },
+    cors: { accessControlAllowOrigin: null, accessControlAllowCredentials: false },
   };
 }
 

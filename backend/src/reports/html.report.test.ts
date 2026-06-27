@@ -16,6 +16,7 @@ function dados(over: Partial<DadosRelatorio> = {}): DadosRelatorio {
       exposicao: { server: "nginx", xPoweredBy: null, comentariosHtmlEncontrados: 2, robotsTxtExiste: true, sitemapXmlExiste: false },
       tecnologias: { frameworks: ["React"], cms: [], servidorWeb: "nginx", cdn: [], bibliotecasJs: [], linguagem: null },
       performance: { tempoRespostaMs: 320, compressao: "br", cache: "max-age=60", tamanhoPaginaBytes: 2048, quantidadeRequisicoesIniciais: 5 },
+      cors: { accessControlAllowOrigin: null, accessControlAllowCredentials: false },
     },
     categorias: [
       { categoria: "HTTPS", pontos: 30, pontosMaximos: 30, problemas: [], aprovados: ["ok"] },

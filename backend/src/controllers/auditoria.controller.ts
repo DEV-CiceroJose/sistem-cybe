@@ -57,6 +57,7 @@ export async function criarAuditoria(req: Request, res: Response) {
           performance: JSON.stringify(resultado.performance),
           scoreDetalhe: JSON.stringify(scoreFinal.categorias),
           vulnerabilidades: JSON.stringify(scoreFinal.vulnerabilidades),
+          cors: JSON.stringify(resultado.cors),
         },
       }),
       prisma.relatorio.create({
@@ -139,6 +140,7 @@ export async function buscarRelatorioHtml(req: Request, res: Response) {
     performance: JSON.parse(auditoria.resultado.performance),
     scoreDetalhe: JSON.parse(auditoria.resultado.scoreDetalhe),
     vulnerabilidades: JSON.parse(auditoria.resultado.vulnerabilidades || "[]"),
+    cors: JSON.parse(auditoria.resultado.cors || '{"accessControlAllowOrigin":null,"accessControlAllowCredentials":false}'),
   };
 
   const dados = montarDadosRelatorio(auditoria, resultado, configs);
@@ -169,6 +171,7 @@ function serializarAuditoria(auditoria: any) {
           performance: JSON.parse(auditoria.resultado.performance),
           scoreDetalhe: JSON.parse(auditoria.resultado.scoreDetalhe),
           vulnerabilidades: JSON.parse(auditoria.resultado.vulnerabilidades || "[]"),
+          cors: JSON.parse(auditoria.resultado.cors || '{"accessControlAllowOrigin":null,"accessControlAllowCredentials":false}'),
         }
       : null,
   };

@@ -11,6 +11,7 @@ function base(): ScanResultado {
     exposicao: { server: "nginx", xPoweredBy: null, comentariosHtmlEncontrados: 0, robotsTxtExiste: true, sitemapXmlExiste: true },
     tecnologias: { frameworks: [], cms: [], servidorWeb: "nginx", cdn: [], bibliotecasJs: [], linguagem: null },
     performance: { tempoRespostaMs: 200, compressao: "br", cache: "max-age=60", tamanhoPaginaBytes: 1000, quantidadeRequisicoesIniciais: 3 },
+    cors: { accessControlAllowOrigin: null, accessControlAllowCredentials: false },
   };
 }
 

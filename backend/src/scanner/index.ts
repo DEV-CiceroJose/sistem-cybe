@@ -3,6 +3,7 @@ import { extrairHeaders, extrairCookies } from "./headers.scanner";
 import { detectarExposicao, verificarArquivo } from "./exposicao.scanner";
 import { detectarTecnologias } from "./tecnologias.scanner";
 import { medirPerformance } from "./performance.scanner";
+import { extrairCors } from "./cors.scanner";
 import { validarFormatoUrl, resolverEValidarHost } from "../utils/ssrfGuard";
 import { env } from "../config/env";
 import type { ScanResultado } from "../types/scanner.types";
@@ -87,6 +88,7 @@ export async function executarScan(rawUrl: string): Promise<{ resultado: ScanRes
   const exposicaoBase = detectarExposicao(resp.headers, html);
   const tecnologias = detectarTecnologias(html, resp.headers);
   const performance = medirPerformance(resp.headers, html, tempoRespostaMs);
+  const cors = extrairCors(resp.headers);
 
   const resultado: ScanResultado = {
     https,
@@ -99,6 +101,7 @@ export async function executarScan(rawUrl: string): Promise<{ resultado: ScanRes
     },
     tecnologias,
     performance,
+    cors,
   };
 
   return { resultado, urlFinal };

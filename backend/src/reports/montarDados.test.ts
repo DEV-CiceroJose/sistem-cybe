@@ -15,6 +15,7 @@ const resultado = {
   exposicao: { server: null, xPoweredBy: null, comentariosHtmlEncontrados: 0, robotsTxtExiste: false, sitemapXmlExiste: false },
   tecnologias: { frameworks: [], cms: [], servidorWeb: null, cdn: [], bibliotecasJs: [], linguagem: null },
   performance: { tempoRespostaMs: 100, compressao: null, cache: null, tamanhoPaginaBytes: 1, quantidadeRequisicoesIniciais: 1 },
+  cors: { accessControlAllowOrigin: null, accessControlAllowCredentials: false },
   scoreDetalhe: [{ categoria: "HTTPS", pontos: 30, pontosMaximos: 30, problemas: [], aprovados: [] }],
   vulnerabilidades: [{ id: "v1", refId: "header-csp-ausente", titulo: "CSP ausente", descricao: "d", categoria: "Headers", severidade: "ALTA" as const, cvss: 6.1, impacto: 4, facilidadeCorrecao: 2, tempoEstimado: "2-4h", tempoEstimadoMin: 180, recomendacao: "Defina CSP" }],
 };
