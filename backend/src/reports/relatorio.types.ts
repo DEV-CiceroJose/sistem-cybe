@@ -3,6 +3,7 @@ import type {
   ScoreCategoria,
   Vulnerabilidade,
   ResumoPrioridades,
+  ConformidadeResultado,
 } from "../types/scanner.types";
 
 export interface MarcaRelatorio {
@@ -23,5 +24,6 @@ export interface DadosRelatorio {
   categorias: ScoreCategoria[];
   vulnerabilidades: Vulnerabilidade[];
   resumoPrioridades: ResumoPrioridades;
+  conformidade: ConformidadeResultado;
   marca: MarcaRelatorio;
 }

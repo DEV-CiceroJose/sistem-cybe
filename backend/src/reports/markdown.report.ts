@@ -1,5 +1,6 @@
 import type { ScanResultado, ScoreFinal, Severidade } from "../types/scanner.types";
 import { SEVERIDADE_LABEL } from "../services/vulnerabilidades.catalog";
+import { avaliarConformidade } from "../services/conformidade.service";
 
 const EMOJI_CLASSIFICACAO: Record<ScoreFinal["classificacao"], string> = {
   EXCELENTE: "🟢 Excelente",
@@ -36,6 +37,7 @@ export function gerarRelatorioMarkdown(url: string, resultado: ScanResultado, sc
   const recomendacoes = gerarRecomendacoes(resultado, todosProblemas);
   const planoDeAcao = gerarPlanoDeAcao(scoreFinal);
   const evidencias = gerarEvidencias(resultado);
+  const conformidadeMd = gerarConformidadeMd(avaliarConformidade(resultado));
 
   return `# Relatório de Análise de Segurança
 
@@ -71,6 +73,8 @@ ${recomendacoes.length > 0 ? recomendacoes.map((r) => `- ${r}`).join("\n") : "- 
 
 ${evidencias}
 
+${conformidadeMd}
+
 ## Conclusão
 
 ${gerarConclusao(scoreFinal)}
@@ -83,6 +87,18 @@ As verificações realizadas são exclusivamente passivas.
 ---
 *Relatório gerado automaticamente pelo Web Security Analyzer. As verificações realizadas são exclusivamente passivas e não envolvem exploração de vulnerabilidades.*
 `;
+}
+
+function gerarConformidadeMd(c: ReturnType<typeof avaliarConformidade>): string {
+  const linhas = c.grupos
+    .map(
+      (g) =>
+        `### ${g.grupo} — ${g.percentual}%\n\n${g.itens
+          .map((i) => `- ${i.status === "CONFORME" ? "✅" : i.status === "PARCIAL" ? "🟡" : "❌"} ${i.titulo} (${i.referenciaOwasp})`)
+          .join("\n")}`,
+    )
+    .join("\n\n");
+  return `## Conformidade (OWASP Top 10)\n\nConformidade geral: **${c.percentual}%**\n\n${linhas}`;
 }
 
 function gerarEvidencias(resultado: ScanResultado): string {

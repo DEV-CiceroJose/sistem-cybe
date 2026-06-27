@@ -26,6 +26,7 @@ function dados(over: Partial<DadosRelatorio> = {}): DadosRelatorio {
       { id: "v1", refId: "header-csp-ausente", titulo: "CSP ausente", descricao: "d", categoria: "Headers", severidade: "ALTA", cvss: 6.1, impacto: 4, facilidadeCorrecao: 2, tempoEstimado: "2-4h", tempoEstimadoMin: 180, recomendacao: "Defina CSP" },
     ],
     resumoPrioridades: { total: 1, porSeveridade: { CRITICA: 0, ALTA: 1, MEDIA: 0, BAIXA: 0, INFORMATIVA: 0 }, tempoTotalEstimadoMin: 180, corrijaPrimeiro: [] },
+    conformidade: { grupos: [{ grupo: "HTTPS/TLS", itens: [{ id: "https-habilitado", titulo: "Conexão HTTPS habilitada", status: "CONFORME", referenciaOwasp: "A02:2021 – Cryptographic Failures", explicacao: "e", recomendacao: "r" }], conformes: 1, total: 1, percentual: 100 }], conformes: 1, total: 1, percentual: 100 },
     marca: { empresa: "ACME Seg", site: "acme.com", auditor: "Cícero", contato: "ci@acme.com", logoUrl: "" },
     ...over,
   };
@@ -48,7 +49,7 @@ describe("gerarRelatorioHtml", () => {
 
   it("inclui índice clicável com âncoras que existem como ids de seção", () => {
     const html = gerarRelatorioHtml(dados());
-    for (const id of ["resumo", "graficos", "linha-do-tempo", "evidencias", "plano-de-acao", "recomendacoes", "assinatura"]) {
+    for (const id of ["resumo", "graficos", "linha-do-tempo", "evidencias", "plano-de-acao", "recomendacoes", "conformidade", "assinatura"]) {
       expect(html).toContain(`href="#${id}"`);
       expect(html).toContain(`id="${id}"`);
     }
@@ -87,6 +88,13 @@ describe("gerarRelatorioHtml", () => {
   it("sem vulnerabilidades, o plano mostra estado positivo", () => {
     const html = gerarRelatorioHtml(dados({ vulnerabilidades: [], resumoPrioridades: { total: 0, porSeveridade: { CRITICA: 0, ALTA: 0, MEDIA: 0, BAIXA: 0, INFORMATIVA: 0 }, tempoTotalEstimadoMin: 0, corrijaPrimeiro: [] } }));
     expect(html).toContain("Nenhuma vulnerabilidade");
+  });
+
+  it("inclui a seção de conformidade com a porcentagem", () => {
+    const html = gerarRelatorioHtml(dados());
+    expect(html).toContain('id="conformidade"');
+    expect(html).toContain("Conformidade");
+    expect(html).toContain("100%");
   });
 
   it("escapa HTML vindo dos dados (sem injeção)", () => {

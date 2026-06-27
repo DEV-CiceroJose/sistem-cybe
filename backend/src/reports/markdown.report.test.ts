@@ -35,4 +35,11 @@ describe("gerarRelatorioMarkdown (aprimorado)", () => {
     const md = gerarRelatorioMarkdown("https://exemplo.com", r, calcularScore(r));
     expect(md).toContain("## Assinatura");
   });
+
+  it("inclui a seção de conformidade", () => {
+    const r = base();
+    const md = gerarRelatorioMarkdown("https://exemplo.com", r, calcularScore(r));
+    expect(md).toContain("## Conformidade (OWASP Top 10)");
+    expect(md).toContain("Conformidade geral:");
+  });
 });

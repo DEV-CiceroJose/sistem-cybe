@@ -2,6 +2,7 @@ import type { DadosRelatorio } from "./relatorio.types";
 import type { ScanResultado, ScoreCategoria, Vulnerabilidade } from "../types/scanner.types";
 import { lerMarca } from "./branding.service";
 import { resumirPrioridades } from "../services/priorizacao.service";
+import { avaliarConformidade } from "../services/conformidade.service";
 
 interface AuditoriaBasica {
   url: string;
@@ -26,24 +27,26 @@ export function montarDadosRelatorio(
   configs: { chave: string; valor: string }[],
 ): DadosRelatorio {
   const vulnerabilidades = resultado.vulnerabilidades ?? [];
+  const resultadoBase: ScanResultado = {
+    https: resultado.https,
+    headers: resultado.headers,
+    cookies: resultado.cookies,
+    exposicao: resultado.exposicao,
+    tecnologias: resultado.tecnologias,
+    performance: resultado.performance,
+    cors: resultado.cors,
+  };
   return {
     url: auditoria.url,
     criadoEm: auditoria.criadoEm.toISOString(),
     concluidoEm: auditoria.concluidoEm ? auditoria.concluidoEm.toISOString() : null,
     score: auditoria.score ?? 0,
     classificacao: auditoria.classificacao ?? "CRITICA",
-    resultado: {
-      https: resultado.https,
-      headers: resultado.headers,
-      cookies: resultado.cookies,
-      exposicao: resultado.exposicao,
-      tecnologias: resultado.tecnologias,
-      performance: resultado.performance,
-      cors: resultado.cors,
-    },
+    resultado: resultadoBase,
     categorias: resultado.scoreDetalhe ?? [],
     vulnerabilidades,
     resumoPrioridades: resumirPrioridades(vulnerabilidades),
+    conformidade: avaliarConformidade(resultadoBase),
     marca: lerMarca(configs),
   };
 }

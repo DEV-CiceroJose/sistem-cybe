@@ -11,6 +11,12 @@ function esc(s: unknown): string {
     .replace(/"/g, "&quot;");
 }
 
+function rotuloStatus(s: string): string {
+  if (s === "CONFORME") return "Conforme";
+  if (s === "PARCIAL") return "Parcial";
+  return "Não conforme";
+}
+
 function dataBr(iso: string | null): string {
   if (!iso) return "—";
   return new Date(iso).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" });
@@ -123,7 +129,8 @@ export function gerarRelatorioHtml(d: DadosRelatorio): string {
       <li><a href="#evidencias">4. Evidências Técnicas</a></li>
       <li><a href="#plano-de-acao">5. Plano de Ação</a></li>
       <li><a href="#recomendacoes">6. Recomendações</a></li>
-      <li><a href="#assinatura">7. Assinatura</a></li>
+      <li><a href="#conformidade">7. Conformidade (OWASP)</a></li>
+      <li><a href="#assinatura">8. Assinatura</a></li>
     </ul>
   </nav>
 
@@ -184,8 +191,25 @@ export function gerarRelatorioHtml(d: DadosRelatorio): string {
     <ul>${recomendacoes || "<li>Nenhuma recomendação adicional.</li>"}</ul>
   </section>
 
+  <section id="conformidade" class="secao">
+    <h2>7. Conformidade (OWASP Top 10)</h2>
+    <p>Conformidade geral: <strong>${d.conformidade.percentual}%</strong></p>
+    ${d.conformidade.grupos
+      .map(
+        (g) => `<h3>${esc(g.grupo)} — ${g.percentual}%</h3>
+    <table><thead><tr><th>Item</th><th>Status</th><th>Referência</th></tr></thead><tbody>
+    ${g.itens
+      .map(
+        (i) => `<tr><td>${esc(i.titulo)}${i.detalhe ? ` <span class="muted">(${esc(i.detalhe)})</span>` : ""}</td><td>${esc(rotuloStatus(i.status))}</td><td>${esc(i.referenciaOwasp)}</td></tr>`,
+      )
+      .join("")}
+    </tbody></table>`,
+      )
+      .join("")}
+  </section>
+
   <section id="assinatura" class="secao">
-    <h2>7. Assinatura</h2>
+    <h2>8. Assinatura</h2>
     <p>Relatório emitido por <strong>${esc(marca.empresa)}</strong>${marca.site ? ` (${esc(marca.site)})` : ""}.</p>
     <p>Auditor responsável: <strong>${esc(marca.auditor || "—")}</strong>${marca.contato ? ` · ${esc(marca.contato)}` : ""}.</p>
     <p class="muted">Data de emissão: ${dataBr(d.concluidoEm || d.criadoEm)}</p>

@@ -37,4 +37,11 @@ describe("montarDadosRelatorio", () => {
     expect(typeof d.criadoEm).toBe("string");
     expect(d.criadoEm).toContain("2026-06-27");
   });
+
+  it("inclui conformidade calculada do resultado", () => {
+    const d = montarDadosRelatorio(auditoria, resultado, []);
+    expect(d.conformidade).toBeDefined();
+    expect(d.conformidade.grupos.length).toBe(5);
+    expect(typeof d.conformidade.percentual).toBe("number");
+  });
 });

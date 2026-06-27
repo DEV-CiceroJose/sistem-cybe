@@ -8,6 +8,7 @@ import { calcularScore } from "../services/scoring.service";
 import { gerarRelatorioMarkdown } from "../reports/markdown.report";
 import { gerarRelatorioHtml } from "../reports/html.report";
 import { montarDadosRelatorio } from "../reports/montarDados";
+import { avaliarConformidade } from "../services/conformidade.service";
 import { HttpError } from "../middlewares/error.middleware";
 
 const RELATORIOS_DIR = path.join(process.cwd(), "relatorios");
@@ -159,20 +160,22 @@ export async function excluirAuditoria(req: Request, res: Response) {
 
 function serializarAuditoria(auditoria: any) {
   if (!auditoria) return null;
+  const resultado = auditoria.resultado
+    ? {
+        https: JSON.parse(auditoria.resultado.https),
+        headers: JSON.parse(auditoria.resultado.headers),
+        cookies: JSON.parse(auditoria.resultado.cookies),
+        exposicao: JSON.parse(auditoria.resultado.exposicao),
+        tecnologias: JSON.parse(auditoria.resultado.tecnologias),
+        performance: JSON.parse(auditoria.resultado.performance),
+        scoreDetalhe: JSON.parse(auditoria.resultado.scoreDetalhe),
+        vulnerabilidades: JSON.parse(auditoria.resultado.vulnerabilidades || "[]"),
+        cors: JSON.parse(auditoria.resultado.cors || '{"accessControlAllowOrigin":null,"accessControlAllowCredentials":false}'),
+      }
+    : null;
   return {
     ...auditoria,
-    resultado: auditoria.resultado
-      ? {
-          https: JSON.parse(auditoria.resultado.https),
-          headers: JSON.parse(auditoria.resultado.headers),
-          cookies: JSON.parse(auditoria.resultado.cookies),
-          exposicao: JSON.parse(auditoria.resultado.exposicao),
-          tecnologias: JSON.parse(auditoria.resultado.tecnologias),
-          performance: JSON.parse(auditoria.resultado.performance),
-          scoreDetalhe: JSON.parse(auditoria.resultado.scoreDetalhe),
-          vulnerabilidades: JSON.parse(auditoria.resultado.vulnerabilidades || "[]"),
-          cors: JSON.parse(auditoria.resultado.cors || '{"accessControlAllowOrigin":null,"accessControlAllowCredentials":false}'),
-        }
-      : null,
+    resultado,
+    conformidade: resultado ? avaliarConformidade(resultado) : null,
   };
 }
