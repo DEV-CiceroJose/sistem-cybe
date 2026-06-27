@@ -168,6 +168,27 @@ export interface Relatorio {
   criadoEm: string;
 }
 
+export interface AchadoDiff {
+  refId: string;
+  titulo: string;
+  severidade: Severidade;
+  detalhe?: string;
+}
+
+export interface ComparacaoResultado {
+  baseId: string;
+  atualId: string;
+  scoreAnterior: number;
+  scoreAtual: number;
+  scoreDelta: number;
+  conformidadeAnterior: number;
+  conformidadeAtual: number;
+  conformidadeDelta: number;
+  novos: AchadoDiff[];
+  resolvidos: AchadoDiff[];
+  mantidos: AchadoDiff[];
+}
+
 export interface Auditoria {
   id: string;
   url: string;

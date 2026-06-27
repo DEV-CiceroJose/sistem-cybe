@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { Auditoria } from "../types";
+import type { Auditoria, ComparacaoResultado } from "../types";
 
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:3001/api",
@@ -11,8 +11,13 @@ export async function criarAuditoria(url: string): Promise<Auditoria> {
   return data.dados;
 }
 
-export async function listarHistorico(limite = 20): Promise<Auditoria[]> {
-  const { data } = await api.get("/auditorias", { params: { limite } });
+export async function listarHistorico(limite = 20, url?: string): Promise<Auditoria[]> {
+  const { data } = await api.get("/auditorias", { params: { limite, ...(url ? { url } : {}) } });
+  return data.dados;
+}
+
+export async function buscarComparacao(id: string): Promise<ComparacaoResultado | null> {
+  const { data } = await api.get(`/auditorias/${id}/comparacao`);
   return data.dados;
 }
 

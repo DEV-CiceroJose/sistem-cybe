@@ -10,8 +10,9 @@ import { StatusBadge } from "../components/StatusBadge";
 import { PlanoDeAcao } from "../components/PlanoDeAcao";
 import { ChecklistConformidade } from "../components/ChecklistConformidade";
 import { RegistrosDns } from "../components/RegistrosDns";
-import { buscarAuditoria, buscarRelatorioMarkdown, buscarRelatorioHtml, extrairMensagemErro } from "../services/api";
-import type { Auditoria } from "../types";
+import { ComparacaoAnterior } from "../components/ComparacaoAnterior";
+import { buscarAuditoria, buscarRelatorioMarkdown, buscarRelatorioHtml, buscarComparacao, extrairMensagemErro } from "../services/api";
+import type { Auditoria, ComparacaoResultado } from "../types";
 
 function baixarArquivo(nome: string, conteudo: string, tipo: string) {
   const blob = new Blob([conteudo], { type: tipo });
@@ -56,6 +57,7 @@ export function VisualizadorRelatorio() {
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
   const [mostrarMarkdown, setMostrarMarkdown] = useState(false);
+  const [comparacao, setComparacao] = useState<ComparacaoResultado | null>(null);
 
   useEffect(() => {
     if (!id) return;
@@ -63,6 +65,9 @@ export function VisualizadorRelatorio() {
       .then(setAuditoria)
       .catch((e) => setErro(extrairMensagemErro(e)))
       .finally(() => setCarregando(false));
+    buscarComparacao(id)
+      .then(setComparacao)
+      .catch(() => setComparacao(null));
   }, [id]);
 
   async function handleVerMarkdown() {
@@ -136,6 +141,8 @@ export function VisualizadorRelatorio() {
         {auditoria.conformidade && <ChecklistConformidade conformidade={auditoria.conformidade} />}
 
         {r && r.dns && <RegistrosDns dns={r.dns} />}
+
+        {comparacao && <ComparacaoAnterior comparacao={comparacao} />}
 
         {r && (
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
