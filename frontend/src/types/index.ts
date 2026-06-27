@@ -79,6 +79,38 @@ export interface Vulnerabilidade {
   detalhe?: string;
 }
 
+export interface CorsInfo {
+  accessControlAllowOrigin: string | null;
+  accessControlAllowCredentials: boolean;
+}
+
+export type StatusConformidade = "CONFORME" | "PARCIAL" | "NAO_CONFORME";
+
+export interface ItemConformidade {
+  id: string;
+  titulo: string;
+  status: StatusConformidade;
+  referenciaOwasp: string;
+  explicacao: string;
+  recomendacao: string;
+  detalhe?: string;
+}
+
+export interface GrupoConformidade {
+  grupo: string;
+  itens: ItemConformidade[];
+  conformes: number;
+  total: number;
+  percentual: number;
+}
+
+export interface ConformidadeResultado {
+  grupos: GrupoConformidade[];
+  conformes: number;
+  total: number;
+  percentual: number;
+}
+
 export interface ResultadoAuditoria {
   https: HttpsInfo;
   headers: HeadersInfo;
@@ -86,6 +118,7 @@ export interface ResultadoAuditoria {
   exposicao: ExposicaoInfo;
   tecnologias: TecnologiasInfo;
   performance: PerformanceInfo;
+  cors: CorsInfo;
   scoreDetalhe: ScoreCategoria[];
   vulnerabilidades: Vulnerabilidade[];
 }
@@ -108,4 +141,5 @@ export interface Auditoria {
   concluidoEm: string | null;
   resultado?: ResultadoAuditoria | null;
   relatorio?: Relatorio | null;
+  conformidade?: ConformidadeResultado | null;
 }

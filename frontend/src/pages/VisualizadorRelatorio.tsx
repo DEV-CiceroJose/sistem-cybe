@@ -8,6 +8,7 @@ import { ScoreGauge } from "../components/ScoreGauge";
 import { CategoriaScoreList } from "../components/CategoriaScoreList";
 import { StatusBadge } from "../components/StatusBadge";
 import { PlanoDeAcao } from "../components/PlanoDeAcao";
+import { ChecklistConformidade } from "../components/ChecklistConformidade";
 import { buscarAuditoria, buscarRelatorioMarkdown, buscarRelatorioHtml, extrairMensagemErro } from "../services/api";
 import type { Auditoria } from "../types";
 
@@ -130,6 +131,8 @@ export function VisualizadorRelatorio() {
         {r && r.vulnerabilidades && r.vulnerabilidades.length > 0 && (
           <PlanoDeAcao vulnerabilidades={r.vulnerabilidades} auditoriaId={auditoria.id} />
         )}
+
+        {auditoria.conformidade && <ChecklistConformidade conformidade={auditoria.conformidade} />}
 
         {r && (
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
