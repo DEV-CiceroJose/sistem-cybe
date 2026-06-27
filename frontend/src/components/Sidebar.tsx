@@ -4,6 +4,7 @@ const links = [
   { to: "/", label: "Dashboard", icon: "◧" },
   { to: "/nova-auditoria", label: "Nova Auditoria", icon: "▣" },
   { to: "/historico", label: "Histórico", icon: "≡" },
+  { to: "/monitoramento", label: "Monitoramento", icon: "📈" },
   { to: "/configuracoes", label: "Configurações", icon: "⚙" },
 ];
 

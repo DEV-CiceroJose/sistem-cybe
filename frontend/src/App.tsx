@@ -3,6 +3,7 @@ import { Sidebar } from "./components/Sidebar";
 import { Dashboard } from "./pages/Dashboard";
 import { NovaAuditoria } from "./pages/NovaAuditoria";
 import { Historico } from "./pages/Historico";
+import { Monitoramento } from "./pages/Monitoramento";
 import { VisualizadorRelatorio } from "./pages/VisualizadorRelatorio";
 import { Configuracoes } from "./pages/Configuracoes";
 
@@ -15,6 +16,7 @@ export default function App() {
           <Route path="/" element={<Dashboard />} />
           <Route path="/nova-auditoria" element={<NovaAuditoria />} />
           <Route path="/historico" element={<Historico />} />
+          <Route path="/monitoramento" element={<Monitoramento />} />
           <Route path="/auditorias/:id" element={<VisualizadorRelatorio />} />
           <Route path="/configuracoes" element={<Configuracoes />} />
         </Routes>
