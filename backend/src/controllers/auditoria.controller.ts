@@ -6,6 +6,8 @@ import { prisma } from "../database/prisma";
 import { executarScan, ScanError } from "../scanner";
 import { calcularScore } from "../services/scoring.service";
 import { gerarRelatorioMarkdown } from "../reports/markdown.report";
+import { gerarRelatorioHtml } from "../reports/html.report";
+import { montarDadosRelatorio } from "../reports/montarDados";
 import { HttpError } from "../middlewares/error.middleware";
 
 const RELATORIOS_DIR = path.join(process.cwd(), "relatorios");
@@ -116,6 +118,33 @@ export async function buscarRelatorioMarkdown(req: Request, res: Response) {
 
   res.setHeader("Content-Type", "text/markdown; charset=utf-8");
   res.send(relatorio.conteudoMarkdown);
+}
+
+export async function buscarRelatorioHtml(req: Request, res: Response) {
+  const auditoria = await prisma.auditoria.findUnique({
+    where: { id: req.params.id },
+    include: { resultado: true },
+  });
+  if (!auditoria || !auditoria.resultado) {
+    throw new HttpError(404, "Relatório não disponível para esta auditoria.");
+  }
+
+  const configs = await prisma.configuracao.findMany();
+  const resultado = {
+    https: JSON.parse(auditoria.resultado.https),
+    headers: JSON.parse(auditoria.resultado.headers),
+    cookies: JSON.parse(auditoria.resultado.cookies),
+    exposicao: JSON.parse(auditoria.resultado.exposicao),
+    tecnologias: JSON.parse(auditoria.resultado.tecnologias),
+    performance: JSON.parse(auditoria.resultado.performance),
+    scoreDetalhe: JSON.parse(auditoria.resultado.scoreDetalhe),
+    vulnerabilidades: JSON.parse(auditoria.resultado.vulnerabilidades || "[]"),
+  };
+
+  const dados = montarDadosRelatorio(auditoria, resultado, configs);
+  const html = gerarRelatorioHtml(dados);
+  res.setHeader("Content-Type", "text/html; charset=utf-8");
+  res.send(html);
 }
 
 export async function excluirAuditoria(req: Request, res: Response) {
