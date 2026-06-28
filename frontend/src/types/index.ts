@@ -111,6 +111,29 @@ export interface ConformidadeResultado {
   percentual: number;
 }
 
+export type Frequencia = "DIARIA" | "SEMANAL" | "MENSAL";
+export type TipoAlerta = "NOVO_ACHADO" | "QUEDA_SCORE" | "QUEDA_CONFORMIDADE";
+
+export interface Agendamento {
+  id: string;
+  url: string;
+  frequencia: Frequencia;
+  ativo: boolean;
+  ultimaExecucao: string | null;
+  proximaExecucao: string;
+  criadoEm: string;
+}
+
+export interface Alerta {
+  id: string;
+  url: string;
+  tipo: TipoAlerta;
+  mensagem: string;
+  lido: boolean;
+  auditoriaId: string | null;
+  criadoEm: string;
+}
+
 export interface MxRecord {
   exchange: string;
   prioridade: number;

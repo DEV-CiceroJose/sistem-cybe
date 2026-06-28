@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { Auditoria, ComparacaoResultado } from "../types";
+import type { Auditoria, ComparacaoResultado, Agendamento, Alerta, Frequencia } from "../types";
 
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:3001/api",
@@ -47,6 +47,41 @@ export async function listarConfiguracoes(): Promise<{ chave: string; valor: str
 
 export async function salvarConfiguracao(chave: string, valor: string): Promise<void> {
   await api.put("/configuracoes", { chave, valor });
+}
+
+export async function listarAgendamentos(): Promise<Agendamento[]> {
+  const { data } = await api.get("/agendamentos");
+  return data.dados;
+}
+
+export async function criarAgendamento(url: string, frequencia: Frequencia): Promise<Agendamento> {
+  const { data } = await api.post("/agendamentos", { url, frequencia });
+  return data.dados;
+}
+
+export async function atualizarAgendamento(
+  id: string,
+  payload: { ativo?: boolean; frequencia?: Frequencia },
+): Promise<Agendamento> {
+  const { data } = await api.patch(`/agendamentos/${id}`, payload);
+  return data.dados;
+}
+
+export async function excluirAgendamento(id: string): Promise<void> {
+  await api.delete(`/agendamentos/${id}`);
+}
+
+export async function listarAlertas(lido?: boolean): Promise<Alerta[]> {
+  const { data } = await api.get("/alertas", { params: lido === undefined ? {} : { lido } });
+  return data.dados;
+}
+
+export async function marcarAlertaLido(id: string, lido: boolean): Promise<void> {
+  await api.patch(`/alertas/${id}`, { lido });
+}
+
+export async function marcarAlertasLidos(): Promise<void> {
+  await api.post("/alertas/marcar-lidos");
 }
 
 export function extrairMensagemErro(erro: unknown): string {

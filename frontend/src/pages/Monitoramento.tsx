@@ -5,6 +5,8 @@ import { Card } from "../components/Card";
 import { Loader } from "../components/Loader";
 import { Alert } from "../components/Alert";
 import { EvolucaoScore } from "../components/EvolucaoScore";
+import { AlertasPanel } from "../components/AlertasPanel";
+import { AgendamentosManager } from "../components/AgendamentosManager";
 import { listarHistorico, extrairMensagemErro } from "../services/api";
 import type { Auditoria } from "../types";
 
@@ -32,6 +34,8 @@ export function Monitoramento() {
     <>
       <Navbar title="Monitoramento" subtitle="Evolução do score por URL" />
       <main className="flex-1 overflow-y-auto p-6 space-y-4">
+        <AlertasPanel />
+        <AgendamentosManager />
         {carregando && <Loader texto="Carregando" />}
         {erro && <Alert tipo="erro">{erro}</Alert>}
         {!carregando && !erro && porUrl.size === 0 && (

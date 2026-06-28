@@ -1,4 +1,6 @@
+import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
+import { listarAlertas } from "../services/api";
 
 const links = [
   { to: "/", label: "Dashboard", icon: "◧" },
@@ -9,6 +11,14 @@ const links = [
 ];
 
 export function Sidebar() {
+  const [naoLidos, setNaoLidos] = useState(0);
+
+  useEffect(() => {
+    listarAlertas(false)
+      .then((a) => setNaoLidos(a.length))
+      .catch(() => {});
+  }, []);
+
   return (
     <aside className="hidden md:flex md:w-60 flex-col border-r border-line bg-bg-panel/60 px-4 py-6">
       <div className="mb-8 px-2">
@@ -34,6 +44,11 @@ export function Sidebar() {
           >
             <span className="font-display text-xs">{link.icon}</span>
             {link.label}
+            {link.to === "/monitoramento" && naoLidos > 0 && (
+              <span className="ml-auto rounded-full bg-danger/20 px-1.5 py-0.5 text-[10px] font-medium text-danger">
+                {naoLidos}
+              </span>
+            )}
           </NavLink>
         ))}
       </nav>
