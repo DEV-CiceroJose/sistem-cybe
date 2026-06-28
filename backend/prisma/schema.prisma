@@ -99,3 +99,28 @@ model RequestLog {
 
   @@index([criadoEm])
 }
+
+model Webhook {
+  id       String   @id @default(uuid())
+  url      String
+  secret   String
+  ativo    Boolean  @default(true)
+  criadoEm DateTime @default(now())
+
+  @@index([ativo])
+}
+
+// status: SUCESSO | FALHA
+model WebhookEntrega {
+  id          String   @id @default(uuid())
+  webhookId   String
+  auditoriaId String?
+  status      String
+  httpStatus  Int?
+  tentativas  Int      @default(1)
+  erro        String?
+  criadoEm    DateTime @default(now())
+
+  @@index([webhookId])
+  @@index([criadoEm])
+}

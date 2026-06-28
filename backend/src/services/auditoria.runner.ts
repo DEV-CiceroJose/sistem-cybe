@@ -7,6 +7,7 @@ import { gerarRelatorioMarkdown } from "../reports/markdown.report";
 import { avaliarConformidade } from "./conformidade.service";
 import { compararAuditorias } from "./comparacao.service";
 import { gerarAlertas } from "./alertas.service";
+import { dispararWebhooks } from "./webhook.dispatcher";
 import { DNS_VAZIO } from "../scanner/dns.scanner";
 import type { AuditoriaComparavel } from "../types/scanner.types";
 
@@ -93,6 +94,7 @@ export async function executarAuditoriaCompleta(url: string): Promise<string> {
     ]);
 
     await gerarAlertasDaAuditoria(auditoria.id, url);
+    dispararWebhooks(auditoria.id).catch((e) => console.error("[webhooks]", (e as Error).message));
     return auditoria.id;
   } catch (e) {
     const mensagem = e instanceof ScanError ? e.message : "Erro inesperado ao executar a análise.";
