@@ -1,4 +1,4 @@
-import jwt from "jsonwebtoken";
+import jwt, { type SignOptions } from "jsonwebtoken";
 
 export interface Credenciais {
   usuario: string;
@@ -11,7 +11,7 @@ export function validarCredenciais(entrada: Credenciais, esperado: Credenciais):
 }
 
 /** Emite um JWT assinado com o segredo informado. */
-export function gerarToken(segredo: string, expiraEm = "8h"): string {
+export function gerarToken(segredo: string, expiraEm: SignOptions["expiresIn"] = "8h"): string {
   return jwt.sign({ sub: "api" }, segredo, { expiresIn: expiraEm });
 }
 
