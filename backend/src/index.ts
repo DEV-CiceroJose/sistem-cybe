@@ -4,6 +4,7 @@ import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import { env } from "./config/env";
 import { router } from "./routes";
+import { registrarRequisicao } from "./middlewares/requestLog.middleware";
 import { iniciarScheduler } from "./scheduler";
 import { errorHandler, notFoundHandler } from "./middlewares/error.middleware";
 
@@ -26,6 +27,7 @@ const limiter = rateLimit({
   message: { sucesso: false, erro: "Muitas requisições. Tente novamente em alguns minutos." },
 });
 app.use("/api/v1/", limiter);
+app.use("/api/v1", registrarRequisicao);
 
 app.use("/api/v1", router);
 

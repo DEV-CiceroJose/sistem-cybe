@@ -88,3 +88,14 @@ model Alerta {
   @@index([lido])
   @@index([criadoEm])
 }
+
+model RequestLog {
+  id        String   @id @default(uuid())
+  metodo    String
+  caminho   String
+  status    Int
+  duracaoMs Int
+  criadoEm  DateTime @default(now())
+
+  @@index([criadoEm])
+}

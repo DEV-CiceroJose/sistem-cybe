@@ -4,6 +4,7 @@ import { configuracaoRouter } from "./configuracao.routes";
 import { agendamentoRouter } from "./agendamento.routes";
 import { alertaRouter } from "./alerta.routes";
 import { authRouter } from "./auth.routes";
+import { logRouter } from "./log.routes";
 import { autenticar } from "../middlewares/auth.middleware";
 
 export const router = Router();
@@ -19,3 +20,4 @@ router.use("/auditorias", autenticar, auditoriaRouter);
 router.use("/configuracoes", autenticar, configuracaoRouter);
 router.use("/agendamentos", autenticar, agendamentoRouter);
 router.use("/alertas", autenticar, alertaRouter);
+router.use("/logs", autenticar, logRouter);
