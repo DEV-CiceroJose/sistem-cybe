@@ -25,9 +25,9 @@ const limiter = rateLimit({
   legacyHeaders: false,
   message: { sucesso: false, erro: "Muitas requisições. Tente novamente em alguns minutos." },
 });
-app.use("/api/", limiter);
+app.use("/api/v1/", limiter);
 
-app.use("/api", router);
+app.use("/api/v1", router);
 
 app.use(notFoundHandler);
 app.use(errorHandler);
