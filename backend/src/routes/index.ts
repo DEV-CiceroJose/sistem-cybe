@@ -7,6 +7,7 @@ import { agendamentoRouter } from "./agendamento.routes";
 import { alertaRouter } from "./alerta.routes";
 import { authRouter } from "./auth.routes";
 import { logRouter } from "./log.routes";
+import { postmanRouter } from "./postman.routes";
 import { autenticar } from "../middlewares/auth.middleware";
 
 export const router = Router();
@@ -17,6 +18,7 @@ router.get("/health", (_req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 router.use("/docs", swaggerUi.serve, swaggerUi.setup(openapiDocumento as Record<string, unknown>));
+router.use("/postman", postmanRouter);
 
 // Rotas protegidas por JWT
 router.use("/auditorias", autenticar, auditoriaRouter);

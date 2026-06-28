@@ -8,6 +8,7 @@
     "start": "node dist/index.js",
     "test": "vitest run",
     "test:watch": "vitest",
+    "postman:gen": "tsx scripts/gerar-postman.ts",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate deploy",
     "postinstall": "prisma generate"
