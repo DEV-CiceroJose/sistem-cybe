@@ -5,6 +5,7 @@ import { ScanError } from "../scanner";
 import { gerarRelatorioHtml } from "../reports/html.report";
 import { montarDadosRelatorio } from "../reports/montarDados";
 import { avaliarConformidade } from "../services/conformidade.service";
+import { paginar } from "../utils/paginacao";
 import { compararAuditorias } from "../services/comparacao.service";
 import { executarAuditoriaCompleta } from "../services/auditoria.runner";
 import type { AuditoriaComparavel } from "../types/scanner.types";
@@ -40,14 +41,14 @@ export async function criarAuditoria(req: Request, res: Response) {
 }
 
 export async function listarHistorico(req: Request, res: Response) {
-  const limite = Math.min(Number(req.query.limite) || 20, 100);
+  const { limite, offset } = paginar(req.query);
   const url = typeof req.query.url === "string" && req.query.url ? req.query.url : undefined;
-  const auditorias = await prisma.auditoria.findMany({
-    where: url ? { url } : undefined,
-    orderBy: { criadoEm: "desc" },
-    take: limite,
-  });
-  res.json({ sucesso: true, dados: auditorias });
+  const where = url ? { url } : undefined;
+  const [dados, total] = await Promise.all([
+    prisma.auditoria.findMany({ where, orderBy: { criadoEm: "desc" }, take: limite, skip: offset }),
+    prisma.auditoria.count({ where }),
+  ]);
+  res.json({ sucesso: true, dados, paginacao: { total, limite, offset } });
 }
 
 export async function buscarAuditoria(req: Request, res: Response) {

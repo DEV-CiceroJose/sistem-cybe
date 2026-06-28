@@ -1,16 +1,20 @@
 import type { Request, Response } from "express";
 import { z } from "zod";
 import { prisma } from "../database/prisma";
+import { paginar } from "../utils/paginacao";
 import { HttpError } from "../middlewares/error.middleware";
 
 const lidoSchema = z.object({ lido: z.boolean() });
 
 export async function listarAlertas(req: Request, res: Response) {
-  const limite = Math.min(Number(req.query.limite) || 50, 200);
+  const { limite, offset } = paginar(req.query);
   const where =
     req.query.lido === "false" ? { lido: false } : req.query.lido === "true" ? { lido: true } : undefined;
-  const dados = await prisma.alerta.findMany({ where, orderBy: { criadoEm: "desc" }, take: limite });
-  res.json({ sucesso: true, dados });
+  const [dados, total] = await Promise.all([
+    prisma.alerta.findMany({ where, orderBy: { criadoEm: "desc" }, take: limite, skip: offset }),
+    prisma.alerta.count({ where }),
+  ]);
+  res.json({ sucesso: true, dados, paginacao: { total, limite, offset } });
 }
 
 export async function marcarAlertaLido(req: Request, res: Response) {
