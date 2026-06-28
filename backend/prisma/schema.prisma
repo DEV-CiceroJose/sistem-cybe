@@ -7,28 +7,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum AuditoriaStatus {
-  PENDENTE
-  EM_ANDAMENTO
-  CONCLUIDA
-  ERRO
-}
-
-enum Classificacao {
-  EXCELENTE
-  BOA
-  ATENCAO
-  CRITICA
-}
-
+// SQLite não suporta enums no Prisma; usamos String com valores controlados na aplicação.
+// status: PENDENTE | EM_ANDAMENTO | CONCLUIDA | ERRO
+// classificacao: EXCELENTE | BOA | ATENCAO | CRITICA
 model Auditoria {
-  id            String          @id @default(uuid())
+  id            String   @id @default(uuid())
   url           String
-  status        AuditoriaStatus @default(PENDENTE)
+  status        String   @default("PENDENTE")
   score         Int?
-  classificacao Classificacao?
+  classificacao String?
   erro          String?
-  criadoEm      DateTime        @default(now())
+  criadoEm      DateTime @default(now())
   concluidoEm   DateTime?
 
   resultado     Resultado?
@@ -71,4 +60,31 @@ model Configuracao {
   chave        String   @unique
   valor        String
   atualizadoEm DateTime @updatedAt
+}
+
+// frequencia: DIARIA | SEMANAL | MENSAL
+model Agendamento {
+  id              String    @id @default(uuid())
+  url             String
+  frequencia      String
+  ativo           Boolean   @default(true)
+  ultimaExecucao  DateTime?
+  proximaExecucao DateTime
+  criadoEm        DateTime  @default(now())
+
+  @@index([ativo])
+}
+
+// tipo: NOVO_ACHADO | QUEDA_SCORE | QUEDA_CONFORMIDADE
+model Alerta {
+  id          String   @id @default(uuid())
+  url         String
+  tipo        String
+  mensagem    String
+  lido        Boolean  @default(false)
+  auditoriaId String?
+  criadoEm    DateTime @default(now())
+
+  @@index([lido])
+  @@index([criadoEm])
 }

@@ -9,7 +9,7 @@ interface AuditoriaBasica {
   criadoEm: Date;
   concluidoEm: Date | null;
   score: number | null;
-  classificacao: "EXCELENTE" | "BOA" | "ATENCAO" | "CRITICA" | null;
+  classificacao: string | null;
 }
 
 interface ResultadoDesserializado extends ScanResultado {
@@ -42,7 +42,7 @@ export function montarDadosRelatorio(
     criadoEm: auditoria.criadoEm.toISOString(),
     concluidoEm: auditoria.concluidoEm ? auditoria.concluidoEm.toISOString() : null,
     score: auditoria.score ?? 0,
-    classificacao: auditoria.classificacao ?? "CRITICA",
+    classificacao: (auditoria.classificacao ?? "CRITICA") as DadosRelatorio["classificacao"],
     resultado: resultadoBase,
     categorias: resultado.scoreDetalhe ?? [],
     vulnerabilidades,

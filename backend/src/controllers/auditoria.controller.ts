@@ -1,28 +1,19 @@
 import type { Request, Response } from "express";
 import { z } from "zod";
-import fs from "node:fs/promises";
-import path from "node:path";
 import { prisma } from "../database/prisma";
-import { executarScan, ScanError } from "../scanner";
-import { calcularScore } from "../services/scoring.service";
-import { gerarRelatorioMarkdown } from "../reports/markdown.report";
+import { ScanError } from "../scanner";
 import { gerarRelatorioHtml } from "../reports/html.report";
 import { montarDadosRelatorio } from "../reports/montarDados";
 import { avaliarConformidade } from "../services/conformidade.service";
 import { compararAuditorias } from "../services/comparacao.service";
+import { executarAuditoriaCompleta } from "../services/auditoria.runner";
 import type { AuditoriaComparavel } from "../types/scanner.types";
 import { DNS_VAZIO } from "../scanner/dns.scanner";
 import { HttpError } from "../middlewares/error.middleware";
 
-const RELATORIOS_DIR = path.join(process.cwd(), "relatorios");
-
 const criarAuditoriaSchema = z.object({
   url: z.string().min(1, "A URL é obrigatória.").max(2048),
 });
-
-function classificacaoParaEnum(c: string) {
-  return c as "EXCELENTE" | "BOA" | "ATENCAO" | "CRITICA";
-}
 
 export async function criarAuditoria(req: Request, res: Response) {
   const parse = criarAuditoriaSchema.safeParse(req.body);
@@ -35,66 +26,15 @@ export async function criarAuditoria(req: Request, res: Response) {
     url = `https://${url}`;
   }
 
-  const auditoria = await prisma.auditoria.create({
-    data: { url, status: "EM_ANDAMENTO" },
-  });
-
   try {
-    const { resultado, urlFinal } = await executarScan(url);
-    const scoreFinal = calcularScore(resultado);
-    const markdown = gerarRelatorioMarkdown(urlFinal, resultado, scoreFinal);
-
-    await fs.mkdir(RELATORIOS_DIR, { recursive: true });
-    const nomeArquivo = `relatorio-${auditoria.id}.md`;
-    const caminhoArquivo = path.join(RELATORIOS_DIR, nomeArquivo);
-    await fs.writeFile(caminhoArquivo, markdown, "utf-8");
-
-    await prisma.$transaction([
-      prisma.resultado.create({
-        data: {
-          auditoriaId: auditoria.id,
-          https: JSON.stringify(resultado.https),
-          headers: JSON.stringify(resultado.headers),
-          cookies: JSON.stringify(resultado.cookies),
-          exposicao: JSON.stringify(resultado.exposicao),
-          tecnologias: JSON.stringify(resultado.tecnologias),
-          performance: JSON.stringify(resultado.performance),
-          scoreDetalhe: JSON.stringify(scoreFinal.categorias),
-          vulnerabilidades: JSON.stringify(scoreFinal.vulnerabilidades),
-          cors: JSON.stringify(resultado.cors),
-          dns: JSON.stringify(resultado.dns),
-        },
-      }),
-      prisma.relatorio.create({
-        data: {
-          auditoriaId: auditoria.id,
-          caminhoArquivo: nomeArquivo,
-          conteudoMarkdown: markdown,
-        },
-      }),
-      prisma.auditoria.update({
-        where: { id: auditoria.id },
-        data: {
-          status: "CONCLUIDA",
-          score: scoreFinal.score,
-          classificacao: classificacaoParaEnum(scoreFinal.classificacao),
-          concluidoEm: new Date(),
-        },
-      }),
-    ]);
-
+    const id = await executarAuditoriaCompleta(url);
     const auditoriaFinal = await prisma.auditoria.findUnique({
-      where: { id: auditoria.id },
+      where: { id },
       include: { resultado: true, relatorio: true },
     });
-
     res.status(201).json({ sucesso: true, dados: serializarAuditoria(auditoriaFinal) });
   } catch (e) {
     const mensagem = e instanceof ScanError ? e.message : "Erro inesperado ao executar a análise.";
-    await prisma.auditoria.update({
-      where: { id: auditoria.id },
-      data: { status: "ERRO", erro: mensagem },
-    });
     throw new HttpError(e instanceof ScanError ? 422 : 500, mensagem);
   }
 }
