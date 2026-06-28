@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { Auditoria, ComparacaoResultado, Agendamento, Alerta, Frequencia } from "../types";
+import type { Auditoria, ComparacaoResultado, Agendamento, Alerta, Frequencia, Webhook } from "../types";
 
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:3001/api/v1",
@@ -106,6 +106,28 @@ export async function marcarAlertaLido(id: string, lido: boolean): Promise<void>
 
 export async function marcarAlertasLidos(): Promise<void> {
   await api.post("/alertas/marcar-lidos");
+}
+
+export async function listarWebhooks(): Promise<Webhook[]> {
+  const { data } = await api.get("/webhooks");
+  return data.dados;
+}
+
+export async function criarWebhook(url: string): Promise<Webhook> {
+  const { data } = await api.post("/webhooks", { url });
+  return data.dados;
+}
+
+export async function atualizarWebhook(id: string, ativo: boolean): Promise<void> {
+  await api.patch(`/webhooks/${id}`, { ativo });
+}
+
+export async function excluirWebhook(id: string): Promise<void> {
+  await api.delete(`/webhooks/${id}`);
+}
+
+export function urlPostman(): string {
+  return `${api.defaults.baseURL}/postman`;
 }
 
 export function extrairMensagemErro(erro: unknown): string {

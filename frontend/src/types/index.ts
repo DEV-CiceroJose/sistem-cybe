@@ -171,6 +171,14 @@ export interface DnsInfo {
   erro?: string;
 }
 
+export interface Webhook {
+  id: string;
+  url: string;
+  secret: string;
+  ativo: boolean;
+  criadoEm: string;
+}
+
 export interface ResultadoAuditoria {
   https: HttpsInfo;
   headers: HeadersInfo;

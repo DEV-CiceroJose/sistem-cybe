@@ -3,6 +3,7 @@ import { Navbar } from "../components/Navbar";
 import { Card } from "../components/Card";
 import { Alert } from "../components/Alert";
 import { api, extrairMensagemErro, listarConfiguracoes, salvarConfiguracao } from "../services/api";
+import { WebhooksManager } from "../components/WebhooksManager";
 
 interface Marca {
   empresa: string;
@@ -132,6 +133,8 @@ export function Configuracoes() {
             Salvar marca
           </button>
         </Card>
+
+        <WebhooksManager />
       </main>
     </>
   );
