@@ -4,6 +4,7 @@ import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import { env } from "./config/env";
 import { router } from "./routes";
+import { iniciarScheduler } from "./scheduler";
 import { errorHandler, notFoundHandler } from "./middlewares/error.middleware";
 
 const app = express();
@@ -34,3 +35,7 @@ app.use(errorHandler);
 app.listen(env.port, () => {
   console.log(`[Web Security Analyzer] Backend rodando na porta ${env.port} (${env.nodeEnv})`);
 });
+
+if (env.nodeEnv !== "test") {
+  iniciarScheduler();
+}
