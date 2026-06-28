@@ -1,4 +1,6 @@
 import { Router } from "express";
+import swaggerUi from "swagger-ui-express";
+import { openapiDocumento } from "../docs/openapi";
 import { auditoriaRouter } from "./auditoria.routes";
 import { configuracaoRouter } from "./configuracao.routes";
 import { agendamentoRouter } from "./agendamento.routes";
@@ -14,6 +16,7 @@ router.use("/auth", authRouter);
 router.get("/health", (_req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
+router.use("/docs", swaggerUi.serve, swaggerUi.setup(openapiDocumento as Record<string, unknown>));
 
 // Rotas protegidas por JWT
 router.use("/auditorias", autenticar, auditoriaRouter);
