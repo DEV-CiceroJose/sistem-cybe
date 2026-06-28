@@ -2,9 +2,33 @@ import axios from "axios";
 import type { Auditoria, ComparacaoResultado, Agendamento, Alerta, Frequencia } from "../types";
 
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:3001/api",
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:3001/api/v1",
   timeout: 30000,
 });
+
+export const TOKEN_KEY = "wsa:token";
+
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem(TOKEN_KEY);
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+
+api.interceptors.response.use(
+  (r) => r,
+  (erro) => {
+    if (axios.isAxiosError(erro) && erro.response?.status === 401) {
+      localStorage.removeItem(TOKEN_KEY);
+      if (location.pathname !== "/login") location.href = "/login";
+    }
+    return Promise.reject(erro);
+  },
+);
+
+export async function autenticarApi(usuario: string, senha: string): Promise<string> {
+  const { data } = await api.post("/auth/login", { usuario, senha });
+  return data.dados.token;
+}
 
 export async function criarAuditoria(url: string): Promise<Auditoria> {
   const { data } = await api.post("/auditorias", { url });
