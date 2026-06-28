@@ -203,3 +203,10 @@ export interface ComparacaoResultado {
   resolvidos: AchadoDiff[];
   mantidos: AchadoDiff[];
 }
+
+export type TipoAlerta = "NOVO_ACHADO" | "QUEDA_SCORE" | "QUEDA_CONFORMIDADE";
+
+export interface AlertaGerado {
+  tipo: TipoAlerta;
+  mensagem: string;
+}
