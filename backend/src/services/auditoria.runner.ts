@@ -8,6 +8,9 @@ import { avaliarConformidade } from "./conformidade.service";
 import { compararAuditorias } from "./comparacao.service";
 import { gerarAlertas } from "./alertas.service";
 import { dispararWebhooks } from "./webhook.dispatcher";
+import { lerPluginsAtivos } from "./plugins.service";
+import { registrarPluginsEmbutidos } from "../plugins";
+import { idsPlugins } from "../plugins/registro";
 import { DNS_VAZIO } from "../scanner/dns.scanner";
 import type { AuditoriaComparavel } from "../types/scanner.types";
 
@@ -55,7 +58,10 @@ export async function executarAuditoriaCompleta(url: string): Promise<string> {
   const auditoria = await prisma.auditoria.create({ data: { url, status: "EM_ANDAMENTO" } });
 
   try {
-    const { resultado, urlFinal } = await executarScan(url);
+    registrarPluginsEmbutidos();
+    const configs = await prisma.configuracao.findMany();
+    const idsAtivos = lerPluginsAtivos(configs, idsPlugins());
+    const { resultado, urlFinal } = await executarScan(url, idsAtivos);
     const scoreFinal = calcularScore(resultado);
     const markdown = gerarRelatorioMarkdown(urlFinal, resultado, scoreFinal);
 
