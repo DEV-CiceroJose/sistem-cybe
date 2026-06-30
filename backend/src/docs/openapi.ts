@@ -58,5 +58,18 @@ export const openapiDocumento = {
     "/logs": {
       get: { summary: "Lista logs de requisição (paginado)", responses: { "200": { description: "Lista" } } },
     },
+    "/plugins": {
+      get: { summary: "Lista os plugins de coleta e o estado ativo", responses: { "200": { description: "Lista" } } },
+    },
+    "/plugins/{id}": {
+      patch: {
+        summary: "Ativa ou desativa um plugin",
+        requestBody: {
+          required: true,
+          content: { "application/json": { schema: { type: "object", properties: { ativo: { type: "boolean" } }, required: ["ativo"] } } },
+        },
+        responses: { "200": { description: "Atualizado" }, "404": { description: "Plugin não encontrado" } },
+      },
+    },
   },
 } as const;

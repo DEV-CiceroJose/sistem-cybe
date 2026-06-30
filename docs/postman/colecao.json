@@ -128,6 +128,32 @@
           }
         ]
       }
+    },
+    {
+      "name": "GET /plugins",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/v1/plugins",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PATCH /plugins/{id}",
+      "request": {
+        "method": "PATCH",
+        "url": "http://localhost:3001/api/v1/plugins/{id}",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
     }
   ]
 }

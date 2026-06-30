@@ -9,6 +9,7 @@ import { authRouter } from "./auth.routes";
 import { logRouter } from "./log.routes";
 import { postmanRouter } from "./postman.routes";
 import { webhookRouter } from "./webhook.routes";
+import { pluginRouter } from "./plugin.routes";
 import { autenticar } from "../middlewares/auth.middleware";
 
 export const router = Router();
@@ -28,3 +29,4 @@ router.use("/agendamentos", autenticar, agendamentoRouter);
 router.use("/alertas", autenticar, alertaRouter);
 router.use("/logs", autenticar, logRouter);
 router.use("/webhooks", autenticar, webhookRouter);
+router.use("/plugins", autenticar, pluginRouter);
