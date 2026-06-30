@@ -6,6 +6,7 @@ import { Historico } from "./pages/Historico";
 import { Monitoramento } from "./pages/Monitoramento";
 import { VisualizadorRelatorio } from "./pages/VisualizadorRelatorio";
 import { Configuracoes } from "./pages/Configuracoes";
+import { Plugins } from "./pages/Plugins";
 import { Login } from "./pages/Login";
 import { RotaProtegida } from "./components/RotaProtegida";
 
@@ -26,6 +27,7 @@ export default function App() {
                   <Route path="/historico" element={<Historico />} />
                   <Route path="/monitoramento" element={<Monitoramento />} />
                   <Route path="/auditorias/:id" element={<VisualizadorRelatorio />} />
+                  <Route path="/plugins" element={<Plugins />} />
                   <Route path="/configuracoes" element={<Configuracoes />} />
                 </Routes>
               </div>

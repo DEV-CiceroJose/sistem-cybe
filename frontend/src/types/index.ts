@@ -179,6 +179,13 @@ export interface Webhook {
   criadoEm: string;
 }
 
+export interface PluginInfo {
+  id: string;
+  nome: string;
+  descricao: string;
+  ativo: boolean;
+}
+
 export interface ResultadoAuditoria {
   https: HttpsInfo;
   headers: HeadersInfo;

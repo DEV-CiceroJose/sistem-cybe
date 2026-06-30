@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { Auditoria, ComparacaoResultado, Agendamento, Alerta, Frequencia, Webhook } from "../types";
+import type { Auditoria, ComparacaoResultado, Agendamento, Alerta, Frequencia, Webhook, PluginInfo } from "../types";
 
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:3001/api/v1",
@@ -128,6 +128,15 @@ export async function excluirWebhook(id: string): Promise<void> {
 
 export function urlPostman(): string {
   return `${api.defaults.baseURL}/postman`;
+}
+
+export async function listarPlugins(): Promise<PluginInfo[]> {
+  const { data } = await api.get("/plugins");
+  return data.dados;
+}
+
+export async function atualizarPlugin(id: string, ativo: boolean): Promise<void> {
+  await api.patch(`/plugins/${id}`, { ativo });
 }
 
 export function extrairMensagemErro(erro: unknown): string {

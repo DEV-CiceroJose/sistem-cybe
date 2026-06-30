@@ -8,6 +8,7 @@ const links = [
   { to: "/nova-auditoria", label: "Nova Auditoria", icon: "▣" },
   { to: "/historico", label: "Histórico", icon: "≡" },
   { to: "/monitoramento", label: "Monitoramento", icon: "📈" },
+  { to: "/plugins", label: "Plugins", icon: "⧉" },
   { to: "/configuracoes", label: "Configurações", icon: "⚙" },
 ];
 
