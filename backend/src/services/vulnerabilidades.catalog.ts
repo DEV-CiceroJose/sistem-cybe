@@ -330,6 +330,8 @@ const CATALOGO: Record<string, CatalogoEntrada> = {
   },
 };
 
+export const REFIDS_CONHECIDOS = Object.keys(CATALOGO);
+
 let contadorInstancia = 0;
 
 /**
