@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
-import type { Severidade, Vulnerabilidade } from "../types";
+import type { ConteudoEducativo, Severidade, Vulnerabilidade } from "../types";
 import { Card } from "./Card";
 import { ProgressBar } from "./ProgressBar";
 import { SeverityBadge } from "./SeverityBadge";
+import { buscarEducativo } from "../services/api";
+import { useModoEducativo, type ModoEducativo } from "../hooks/useModoEducativo";
 import {
   SEVERIDADE_ESTILO,
   SEVERIDADE_LABEL,
@@ -46,6 +48,25 @@ function usarCorrigidos(auditoriaId: string) {
   }
 
   return { corrigidos, alternar };
+}
+
+/** Carrega o conteúdo educativo (por refId) uma vez; degrada em silêncio se falhar. */
+function usarEducativo() {
+  const [conteudos, setConteudos] = useState<Record<string, ConteudoEducativo>>({});
+  useEffect(() => {
+    let ativo = true;
+    buscarEducativo()
+      .then((e) => {
+        if (ativo) setConteudos(e.conteudos);
+      })
+      .catch(() => {
+        /* seção educativa não renderiza */
+      });
+    return () => {
+      ativo = false;
+    };
+  }, []);
+  return conteudos;
 }
 
 function nivel3(valor: number): 0 | 1 | 2 {
@@ -140,16 +161,53 @@ function FragmentoLinha({
   );
 }
 
+function BlocoEducativo({ conteudo, modo }: { conteudo: ConteudoEducativo; modo: ModoEducativo }) {
+  const explicacao = modo === "avancado" ? conteudo.explicacaoTecnica : conteudo.explicacaoSimples;
+  return (
+    <div className="mt-2 space-y-2 rounded-md border border-accent/20 bg-accent/5 p-2.5 text-xs">
+      <p className="text-slate-300">{explicacao}</p>
+      <div>
+        <p className="text-[11px] uppercase tracking-wide text-slate-500">Exemplo de ataque</p>
+        <p className="mt-0.5 text-slate-400">{conteudo.exemploAtaque}</p>
+      </div>
+      {conteudo.referencias.length > 0 && (
+        <div>
+          <p className="text-[11px] uppercase tracking-wide text-slate-500">Aprenda mais</p>
+          <ul className="mt-0.5 space-y-0.5">
+            {conteudo.referencias.map((ref) => (
+              <li key={ref.url}>
+                <a
+                  href={ref.url}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="text-accent hover:underline"
+                >
+                  {ref.titulo}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function VulnLinha({
   v,
   corrigido,
   onAlternar,
+  conteudo,
+  modo,
 }: {
   v: Vulnerabilidade;
   corrigido: boolean;
   onAlternar: (id: string) => void;
+  conteudo?: ConteudoEducativo;
+  modo: ModoEducativo;
 }) {
   const [aberto, setAberto] = useState(false);
+  const [educativoAberto, setEducativoAberto] = useState(false);
   const estilo = SEVERIDADE_ESTILO[v.severidade];
 
   return (
@@ -169,12 +227,23 @@ function VulnLinha({
             <span className="text-[11px] text-slate-500">{v.categoria}</span>
           </div>
           {v.detalhe && <p className="mt-0.5 text-xs text-slate-500">{v.detalhe}</p>}
-          <button
-            onClick={() => setAberto((a) => !a)}
-            className="mt-1 text-[11px] text-accent hover:underline"
-          >
-            {aberto ? "Ocultar detalhes" : "Ver detalhes e correção"}
-          </button>
+          <div className="mt-1 flex flex-wrap gap-3">
+            <button
+              onClick={() => setAberto((a) => !a)}
+              className="text-[11px] text-accent hover:underline"
+            >
+              {aberto ? "Ocultar detalhes" : "Ver detalhes e correção"}
+            </button>
+            {conteudo && (
+              <button
+                onClick={() => setEducativoAberto((a) => !a)}
+                className="text-[11px] text-accent hover:underline"
+              >
+                {educativoAberto ? "Ocultar modo educativo" : "📚 Modo educativo"}
+              </button>
+            )}
+          </div>
+          {conteudo && educativoAberto && <BlocoEducativo conteudo={conteudo} modo={modo} />}
           {aberto && (
             <div className="mt-2 space-y-1.5 border-t border-line/60 pt-2 text-xs text-slate-400">
               <p>{v.descricao}</p>
@@ -201,6 +270,8 @@ export function PlanoDeAcao({ vulnerabilidades, auditoriaId }: PlanoDeAcaoProps)
   const { corrigidos, alternar } = usarCorrigidos(auditoriaId);
   const [filtro, setFiltro] = useState<Severidade | "TODAS">("TODAS");
   const [ocultarCorrigidos, setOcultarCorrigidos] = useState(false);
+  const conteudosEducativos = usarEducativo();
+  const { modo, setModo } = useModoEducativo();
 
   const ordenadas = useMemo(() => ordenarVulnerabilidades(vulnerabilidades), [vulnerabilidades]);
 
@@ -298,15 +369,18 @@ export function PlanoDeAcao({ vulnerabilidades, auditoriaId }: PlanoDeAcaoProps)
       <Card
         title="Lista Priorizada"
         action={
-          <label className="flex items-center gap-1.5 text-[11px] text-slate-400">
-            <input
-              type="checkbox"
-              checked={ocultarCorrigidos}
-              onChange={(e) => setOcultarCorrigidos(e.target.checked)}
-              className="h-3.5 w-3.5 accent-accent"
-            />
-            Ocultar corrigidos
-          </label>
+          <div className="flex flex-wrap items-center gap-3">
+            <SeletorModo modo={modo} onModo={setModo} />
+            <label className="flex items-center gap-1.5 text-[11px] text-slate-400">
+              <input
+                type="checkbox"
+                checked={ocultarCorrigidos}
+                onChange={(e) => setOcultarCorrigidos(e.target.checked)}
+                className="h-3.5 w-3.5 accent-accent"
+              />
+              Ocultar corrigidos
+            </label>
+          </div>
         }
       >
         <div className="mb-3 flex flex-wrap gap-2">
@@ -324,11 +398,36 @@ export function PlanoDeAcao({ vulnerabilidades, auditoriaId }: PlanoDeAcaoProps)
             <p className="py-4 text-center text-sm text-slate-500">Nenhum achado neste filtro.</p>
           ) : (
             visiveis.map((v) => (
-              <VulnLinha key={v.id} v={v} corrigido={corrigidos.has(v.id)} onAlternar={alternar} />
+              <VulnLinha
+                key={v.id}
+                v={v}
+                corrigido={corrigidos.has(v.id)}
+                onAlternar={alternar}
+                conteudo={conteudosEducativos[v.refId]}
+                modo={modo}
+              />
             ))
           )}
         </div>
       </Card>
+    </div>
+  );
+}
+
+function SeletorModo({ modo, onModo }: { modo: ModoEducativo; onModo: (m: ModoEducativo) => void }) {
+  return (
+    <div className="flex items-center gap-1 rounded-full border border-line bg-bg-raised/40 p-0.5 text-[11px]">
+      {(["iniciante", "avancado"] as const).map((m) => (
+        <button
+          key={m}
+          onClick={() => onModo(m)}
+          className={`rounded-full px-2.5 py-0.5 transition-colors ${
+            modo === m ? "bg-accent/15 text-accent" : "text-slate-400 hover:text-slate-200"
+          }`}
+        >
+          {m === "iniciante" ? "Iniciante" : "Avançado"}
+        </button>
+      ))}
     </div>
   );
 }

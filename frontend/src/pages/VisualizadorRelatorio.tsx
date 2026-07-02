@@ -11,8 +11,9 @@ import { PlanoDeAcao } from "../components/PlanoDeAcao";
 import { ChecklistConformidade } from "../components/ChecklistConformidade";
 import { RegistrosDns } from "../components/RegistrosDns";
 import { ComparacaoAnterior } from "../components/ComparacaoAnterior";
-import { buscarAuditoria, buscarRelatorioMarkdown, buscarRelatorioHtml, buscarComparacao, extrairMensagemErro } from "../services/api";
-import type { Auditoria, ComparacaoResultado } from "../types";
+import { GlossarioCard } from "../components/GlossarioCard";
+import { buscarAuditoria, buscarRelatorioMarkdown, buscarRelatorioHtml, buscarComparacao, buscarEducativo, extrairMensagemErro } from "../services/api";
+import type { Auditoria, ComparacaoResultado, TermoGlossario } from "../types";
 
 function baixarArquivo(nome: string, conteudo: string, tipo: string) {
   const blob = new Blob([conteudo], { type: tipo });
@@ -58,6 +59,7 @@ export function VisualizadorRelatorio() {
   const [erro, setErro] = useState<string | null>(null);
   const [mostrarMarkdown, setMostrarMarkdown] = useState(false);
   const [comparacao, setComparacao] = useState<ComparacaoResultado | null>(null);
+  const [glossario, setGlossario] = useState<TermoGlossario[]>([]);
 
   useEffect(() => {
     if (!id) return;
@@ -68,6 +70,9 @@ export function VisualizadorRelatorio() {
     buscarComparacao(id)
       .then(setComparacao)
       .catch(() => setComparacao(null));
+    buscarEducativo()
+      .then((e) => setGlossario(e.glossario))
+      .catch(() => setGlossario([]));
   }, [id]);
 
   async function handleVerMarkdown() {
@@ -135,7 +140,10 @@ export function VisualizadorRelatorio() {
         )}
 
         {r && r.vulnerabilidades && r.vulnerabilidades.length > 0 && (
-          <PlanoDeAcao vulnerabilidades={r.vulnerabilidades} auditoriaId={auditoria.id} />
+          <>
+            <PlanoDeAcao vulnerabilidades={r.vulnerabilidades} auditoriaId={auditoria.id} />
+            <GlossarioCard termos={glossario} />
+          </>
         )}
 
         {auditoria.conformidade && <ChecklistConformidade conformidade={auditoria.conformidade} />}

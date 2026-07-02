@@ -186,6 +186,29 @@ export interface PluginInfo {
   ativo: boolean;
 }
 
+export interface ReferenciaEducativa {
+  titulo: string;
+  url: string;
+}
+
+export interface ConteudoEducativo {
+  refId: string;
+  explicacaoSimples: string;
+  explicacaoTecnica: string;
+  exemploAtaque: string;
+  referencias: ReferenciaEducativa[];
+}
+
+export interface TermoGlossario {
+  termo: string;
+  definicao: string;
+}
+
+export interface Educativo {
+  conteudos: Record<string, ConteudoEducativo>;
+  glossario: TermoGlossario[];
+}
+
 export interface ResultadoAuditoria {
   https: HttpsInfo;
   headers: HeadersInfo;

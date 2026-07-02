@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { Auditoria, ComparacaoResultado, Agendamento, Alerta, Frequencia, Webhook, PluginInfo } from "../types";
+import type { Auditoria, ComparacaoResultado, Agendamento, Alerta, Frequencia, Webhook, PluginInfo, Educativo } from "../types";
 
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:3001/api/v1",
@@ -137,6 +137,11 @@ export async function listarPlugins(): Promise<PluginInfo[]> {
 
 export async function atualizarPlugin(id: string, ativo: boolean): Promise<void> {
   await api.patch(`/plugins/${id}`, { ativo });
+}
+
+export async function buscarEducativo(): Promise<Educativo> {
+  const { data } = await api.get("/educativo");
+  return data.dados;
 }
 
 export function extrairMensagemErro(erro: unknown): string {
