@@ -71,5 +71,8 @@ export const openapiDocumento = {
         responses: { "200": { description: "Atualizado" }, "404": { description: "Plugin não encontrado" } },
       },
     },
+    "/educativo": {
+      get: { summary: "Conteúdo educativo por refId e glossário de segurança", responses: { "200": { description: "Conteúdos e glossário" } } },
+    },
   },
 } as const;
