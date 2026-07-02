@@ -2,6 +2,7 @@ import type { DadosRelatorio } from "./relatorio.types";
 import type { Severidade } from "../types/scanner.types";
 import { donutScore, barrasCategorias, barrasSeveridade } from "./charts.svg";
 import { SEVERIDADE_LABEL } from "../services/vulnerabilidades.catalog";
+import { gerarApendiceEducativoHtml } from "./educativo.report";
 
 function esc(s: unknown): string {
   return String(s ?? "")
@@ -131,7 +132,8 @@ export function gerarRelatorioHtml(d: DadosRelatorio): string {
       <li><a href="#plano-de-acao">6. Plano de Ação</a></li>
       <li><a href="#recomendacoes">7. Recomendações</a></li>
       <li><a href="#conformidade">8. Conformidade (OWASP)</a></li>
-      <li><a href="#assinatura">9. Assinatura</a></li>
+      <li><a href="#aprenda-mais">9. Aprenda mais</a></li>
+      <li><a href="#assinatura">10. Assinatura</a></li>
     </ul>
   </nav>
 
@@ -227,8 +229,13 @@ export function gerarRelatorioHtml(d: DadosRelatorio): string {
       .join("")}
   </section>
 
+  <section id="aprenda-mais" class="secao">
+    <h2>9. Aprenda mais</h2>
+    ${gerarApendiceEducativoHtml(d.vulnerabilidades.map((v) => v.refId))}
+  </section>
+
   <section id="assinatura" class="secao">
-    <h2>9. Assinatura</h2>
+    <h2>10. Assinatura</h2>
     <p>Relatório emitido por <strong>${esc(marca.empresa)}</strong>${marca.site ? ` (${esc(marca.site)})` : ""}.</p>
     <p>Auditor responsável: <strong>${esc(marca.auditor || "—")}</strong>${marca.contato ? ` · ${esc(marca.contato)}` : ""}.</p>
     <p class="muted">Data de emissão: ${dataBr(d.concluidoEm || d.criadoEm)}</p>

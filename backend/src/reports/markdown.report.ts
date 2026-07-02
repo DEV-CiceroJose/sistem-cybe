@@ -1,6 +1,7 @@
 import type { ScanResultado, ScoreFinal, Severidade } from "../types/scanner.types";
 import { SEVERIDADE_LABEL } from "../services/vulnerabilidades.catalog";
 import { avaliarConformidade } from "../services/conformidade.service";
+import { gerarApendiceEducativoMd } from "./educativo.report";
 
 const EMOJI_CLASSIFICACAO: Record<ScoreFinal["classificacao"], string> = {
   EXCELENTE: "🟢 Excelente",
@@ -39,6 +40,7 @@ export function gerarRelatorioMarkdown(url: string, resultado: ScanResultado, sc
   const evidencias = gerarEvidencias(resultado);
   const dnsMd = gerarDnsMd(resultado.dns);
   const conformidadeMd = gerarConformidadeMd(avaliarConformidade(resultado));
+  const educativoMd = gerarApendiceEducativoMd(scoreFinal.vulnerabilidades.map((v) => v.refId));
 
   return `# Relatório de Análise de Segurança
 
@@ -77,6 +79,10 @@ ${evidencias}
 ${dnsMd}
 
 ${conformidadeMd}
+
+## Aprenda mais
+
+${educativoMd}
 
 ## Conclusão
 
